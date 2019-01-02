@@ -12,7 +12,11 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
@@ -22,6 +26,38 @@ public class Main {
 	public static void main(String args[]) {
 		JFrame frame = new JFrame("Polynomial Regression");
 		frame.setSize(640, 480);
+
+		// Menubaritems:
+		JMenu settings = new JMenu("Settings");
+		settings.setMnemonic(KeyEvent.VK_S);
+
+		JCheckBoxMenuItem autoAdjusting = new JCheckBoxMenuItem("Auto-Adjusting");
+		// anstelle von einer Ausgabe muss hier dann eine Funktion getriggert werden,
+		// die automatisch eine Auto-adjusting vornimmt.
+		autoAdjusting.addActionListener((event) -> System.out.println("Der Button wurde gedrückt."));
+
+		JMenuItem window = new JMenuItem("Change window");
+		window.addActionListener(event -> System.out.println("Einstellen des Window"));
+
+		JMenuItem delPoints = new JMenuItem("Delete Points");
+		delPoints.addActionListener(event -> System.out.println("Lösche die Punkte"));
+
+		settings.add(window);
+		settings.add(autoAdjusting);
+		settings.addSeparator();
+		settings.add(delPoints);
+
+		JMenu options = new JMenu("Options");
+		options.setMnemonic(KeyEvent.VK_O);
+
+		// Die egentliche MenuBar:
+		JMenuBar menuBar = new JMenuBar();
+		menuBar.add(settings);
+		menuBar.add(options);
+
+		frame.setJMenuBar(menuBar);
+
+		// Das eigentliche Wunder:
 		Panel p = new Panel();
 		frame.setLayout(new BorderLayout());
 		frame.add(p, BorderLayout.CENTER);
