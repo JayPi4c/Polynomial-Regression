@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -19,17 +21,22 @@ import com.JayPi4c.logic.Logic;
 
 public class Main {
 
+	public static ResourceBundle messages;
+
 	public static void main(String args[]) {
-		JFrame frame = new JFrame("Polynomial Regression");
+		Locale currentLocale = new Locale("de", "DE");
+		messages = ResourceBundle.getBundle("MessagesBundle", currentLocale);
+
+		JFrame frame = new JFrame(messages.getString("MainFrame"));
 		frame.setSize(640, 480);
 
 		CoordinateSystem coordSys = new CoordinateSystem();
 
 		// Menubaritems:
-		JMenu settings = new JMenu("Settings");
+		JMenu settings = new JMenu(messages.getString("settings"));
 		settings.setMnemonic(KeyEvent.VK_S);
 
-		JCheckBoxMenuItem autoAdjusting = new JCheckBoxMenuItem("Auto-Adjusting");
+		JCheckBoxMenuItem autoAdjusting = new JCheckBoxMenuItem(messages.getString("autoAdjusting"));
 		// anstelle von einer Ausgabe muss hier dann eine Funktion getriggert werden,
 		// die automatisch eine Auto-adjusting vornimmt.
 		autoAdjusting.addActionListener(event -> {
@@ -39,23 +46,18 @@ public class Main {
 				coordSys.repaint();
 			}
 		});
-		autoAdjusting.setToolTipText("Ermittle automatisch den besten Grad der Funktion.");
+		autoAdjusting.setToolTipText(messages.getString("adjustToolTip"));
 
-		JMenuItem window = new JMenuItem("Change window");
-		window.addActionListener(event -> System.out.println("Einstellen des Window"));
+		JMenuItem window = new JMenuItem(messages.getString("changeWindow"));
+		window.addActionListener(event -> System.out.println(messages.getString("Einstellen des Window")));
 
-		/*
-		 * JMenuItem setDegree = new JMenuItem("Set Degree");
-		 * setDegree.addActionListener(event -> { Logic.degree = getInput("");
-		 * Logic.update(); coordSys.repaint(); });
-		 */
-		JMenuItem setValues = new JMenuItem("Set Values");
+		JMenuItem setValues = new JMenuItem(messages.getString("setValues"));
 		setValues.addActionListener(event -> new SettingsFrame());
 
-		JMenuItem delPoints = new JMenuItem("Delete Points");
+		JMenuItem delPoints = new JMenuItem(messages.getString("delPoints"));
 		delPoints.addActionListener(event -> {
-			int answer = JOptionPane.showConfirmDialog(null, "Sollen wirklich alle Punkte gelöscht werden?",
-					"Punkte löschen?", JOptionPane.YES_NO_OPTION);
+			int answer = JOptionPane.showConfirmDialog(null, messages.getString("delMessage"),
+					messages.getString("delPointsTitle"), JOptionPane.YES_NO_OPTION);
 			if (answer == JOptionPane.YES_OPTION) {
 				Logic.points = new ArrayList<Point>();
 				coordSys.repaint();
@@ -68,8 +70,21 @@ public class Main {
 		settings.addSeparator();
 		settings.add(delPoints);
 
-		JMenu options = new JMenu("Options");
+		JMenu options = new JMenu(messages.getString("options"));
 		options.setMnemonic(KeyEvent.VK_O);
+
+		JMenu language = new JMenu("Language");
+		options.add(language);
+
+		JMenuItem english = new JMenuItem("English");
+		english.addActionListener(
+				event -> messages = ResourceBundle.getBundle("MessagesBundle", new Locale("en", "US")));
+		JMenuItem german = new JMenuItem("German");
+		german.addActionListener(
+				event -> messages = ResourceBundle.getBundle("MessagesBundle", new Locale("de", "DE")));
+
+		language.add(english);
+		language.add(german);
 
 		// Die egentliche MenuBar:
 		JMenuBar menuBar = new JMenuBar();
@@ -85,17 +100,6 @@ public class Main {
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		frame.setVisible(true);
-	}
-
-	static int getInput(String message) {
-		try {
-			return Math.max(0,
-					Integer.parseInt(
-							JOptionPane.showInputDialog(null, "Welchen Grad soll die Funktion haben\n" + message,
-									"Grad festlegen", JOptionPane.QUESTION_MESSAGE)));
-		} catch (NumberFormatException e) {
-			return getInput("Der Wert muss eine Ganzzahl sein.");
-		}
 	}
 
 }
