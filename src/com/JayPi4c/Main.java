@@ -10,8 +10,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -37,7 +35,8 @@ public class Main {
 		private static final long serialVersionUID = 1000943736638858551L;
 
 		int k = 0;
-		double coefficients[];
+
+		Polynomial polynomial;
 
 		ArrayList<Point> points;
 		int r = 3;
@@ -66,12 +65,12 @@ public class Main {
 			for (Point p : points)
 				g2d.fillOval(p.x - r + (int) (this.getWidth() * 0.5), p.y * -1 - r + (int) (this.getHeight() * 0.5),
 						r * 2, r * 2);
-			if (points.size() > k + 1) {
+			if (points.size() > k) {
 				// draw the function:
 				g2d.setColor(new Color(0, 255, 0));
-				Point prev = new Point(-this.getWidth(), (int) getY(-this.getWidth()));
+				Point prev = new Point(-this.getWidth(), (int) this.polynomial.getY(-this.getWidth()));
 				for (int i = -this.getWidth() + 1; i < this.getWidth() + 1; i++) {
-					Point p = new Point(i, (int) getY(i));
+					Point p = new Point(i, (int) this.polynomial.getY(i));
 					g2d.drawLine(prev.x + (int) (this.getWidth() * 0.5), prev.y * -1 + (int) (this.getHeight() * 0.5),
 							p.x + (int) (this.getWidth() * 0.5), p.y * -1 + (int) (this.getHeight() * 0.5));
 					prev = p;
@@ -96,19 +95,12 @@ public class Main {
 			Point point = e.getPoint();
 			point.setLocation(point.x - this.getWidth() * 0.5, (point.y - this.getHeight() * 0.5) * -1);
 			points.add(point);
-			// System.out.println("Ein Neuer Punkt bei (" + p.x + "|" + p.y + ")");
-			if (points.size() > 1) {
+			if (points.size() > 0) {
 				// do the Matrix math:
 				calculateCoefficients();
 
 				// calculate the average distance of the points to the function
-				/*
-				 * double avg = 0; for (Point p : points) avg += getDistance(p); avg /=
-				 * points.size();
-				 * System.out.println("Der durchschnittlche Abstand zur Funktion beträgt: " +
-				 * avg);
-				 */
-
+				System.out.println("Der durchschnittliche Abstand betraegt: " + getAverageDistance());
 			}
 			repaint();
 		}
@@ -123,13 +115,6 @@ public class Main {
 
 		}
 
-		public double getY(double x) {
-			double sum = 0;
-			for (int i = coefficients.length - 1; i >= 0; i--)
-				sum += coefficients[i] * Math.pow(x, i);
-			return sum;
-		}
-
 		public void calculateCoefficients() {
 			double b_data[] = new double[k + 1];
 			for (int i = 0; i < b_data.length; i++) {
@@ -140,7 +125,6 @@ public class Main {
 			}
 			Matrix b = new Matrix(b_data.length, 1);
 			b.setColumn(0, b_data);
-			// b.print();
 
 			Matrix m = new Matrix(k + 1, k + 1);
 			for (int i = 0; i < k + 1; i++) {
@@ -155,45 +139,17 @@ public class Main {
 				m.setRow(i, row);
 			}
 
-			// System.out.println("Das ist M:");
-			// m.print();
-
-			coefficients = new double[k + 1];
-			for (int i = 0; i < coefficients.length; i++) {
+			polynomial = new Polynomial();
+			for (int i = 0; i < k + 1; i++) {
 				Matrix m_ = m.copy().setColumn(i, b_data);
-				// System.out.println("Das ist M" + i + ":");
-				// m_.print();
-				coefficients[i] = m_.det() / m.det();
+				polynomial.add(polynomial.new Term(m_.det() / m.det(), i));
 			}
+			polynomial.combine();
+			polynomial.reorder();
+			polynomial.fill();
 
 			// print the generated polynom:
-			System.out.println(getPolynom(coefficients));
-		}
-
-		public double getYDerivative(double x) {
-			double coeffs[] = getDerivative();
-			double sum = 0;
-			for (int i = coeffs.length - 1; i >= 0; i--)
-				sum += coeffs[i] * Math.pow(x, i);
-			return sum;
-		}
-
-		public String getPolynom(double coeffs[]) {
-			String s = "";
-			for (int i = coeffs.length - 1; i >= 0; i--)
-				s += coeffs[i] + (i > 0 ? "x" : "") + (i > 1 ? "^" + i : "")
-						+ (i > 0 ? (coeffs[i - 1] >= 0 ? "+" : "") : "");
-			return s;
-		}
-
-		public String getPolynomFormatted(double coeffs[]) {
-			DecimalFormat df = new DecimalFormat("#.######");
-			df.setRoundingMode(RoundingMode.HALF_UP);
-			String s = "";
-			for (int i = coeffs.length - 1; i >= 0; i--)
-				s += df.format(coeffs[i]) + (i > 0 ? "x" : "") + (i > 1 ? "^" + i : "")
-						+ (i > 0 ? (coeffs[i - 1] >= 0 ? "+" : "") : "");
-			return s;
+			polynomial.print();
 		}
 
 		@Override
@@ -216,11 +172,12 @@ public class Main {
 					repaint();
 				}
 			} else if (e.getKeyChar() == 'i') {
-				JOptionPane.showMessageDialog(null, "Der Polynom lautet:\n" + getPolynomFormatted(coefficients),
+				JOptionPane.showMessageDialog(null, "Der Polynom lautet:\n"/* + getPolynomFormatted(coefficients) */,
 						"Polynomial function", JOptionPane.INFORMATION_MESSAGE);
 			} else if (e.getKeyChar() == 'd') {
-				JOptionPane.showMessageDialog(null, "Die Ableitung lautet:\n" + getPolynomFormatted(getDerivative()),
-						"Ableitung", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(null,
+						"Die Ableitung lautet:\n" /* + getPolynomFormatted(getDerivative()) */, "Ableitung",
+						JOptionPane.INFORMATION_MESSAGE);
 			} else if (e.getKeyChar() == 'a') {
 				k += 1;
 				calculateCoefficients();
@@ -230,29 +187,55 @@ public class Main {
 				calculateCoefficients();
 				repaint();
 			}
+			System.out.println("Der durchschnittliche Abstand betraegt: " + getAverageDistance());
+
 		}
 
-		public double[] getDerivative() {
-			double output[] = new double[coefficients.length - 1];
-			for (int i = coefficients.length - 1; i >= 1; i--)
-				output[i - 1] = coefficients[i] * i;
-			return output;
+		public double getDistance(Point p) {
+			double a = p.getX();
+			double b = p.getY();
+			double coeffs1[] = { a * a, -2 * a, 1, b * b };
+			int degrees1[] = { 0, 1, 2, 0 };
+			// a²-2ax+x²+b²-2bf(x)+(f(x))²
+			Polynomial p1 = new Polynomial(coeffs1, degrees1);
+			Polynomial copy = polynomial.copy();
+			copy.mult((-2 * b));
+			p1.add(copy);
+			copy = polynomial.copy();
+			copy.mult(copy);
+			p1.add(copy);
+			p1.combine();
+			p1.reorder();
+			p1.fill();
+			double root1 = p1.getRoot(a, 50);
+			double dist1 = Math.sqrt(
+					(a - root1) * (a - root1) + (b - this.polynomial.getY(root1)) * (b - this.polynomial.getY(root1)));
+
+			// -a+x-bf'(x)+f(x)*f'(x)
+			double coeffs2[] = { -a, 1 };
+			int degrees2[] = { 0, 1 };
+			Polynomial p2 = new Polynomial(coeffs2, degrees2);
+			Polynomial derivative = this.polynomial.getDerivation();
+			derivative.mult(-b);
+			p2.add(derivative);
+			copy = polynomial.copy();
+			copy.mult(this.polynomial.getDerivation());
+			p2.add(copy);
+			double root2 = p2.getRoot(a, 50);
+
+			double dist2 = Math.sqrt(
+					(a - root2) * (a - root2) + (b - this.polynomial.getY(root2)) * (b - this.polynomial.getY(root2)));
+
+			return Math.min(dist1, dist2);
 		}
 
-		/*
-		 * public double getX(Point p) { double x = -this.getWidth() * 0.5; double a =
-		 * p.x; double b = p.y; for (; x < this.getWidth() * 0.5; x += 0.0001) { double
-		 * y = getY(x); double y_ = getYDerivative(x); double factor1 = 0.5 *
-		 * Math.pow((a * a - 2 * a * x + x * x + b * b - 2 * b * y + y * y), -0.5);
-		 * double factor2 = (-2 * a + 2 * x - 2 * b * y_ + 2 * y * y_); double product =
-		 * factor1 * factor2; // System.out.println(product); if (Math.abs(product) <
-		 * 0.2) { System.out.println(product + ": close enaugh"); return x; } }
-		 * System.out.println("not found"); return this.getWidth(); }
-		 * 
-		 * public double getDistance(Point p) { double a = p.x; double b = p.y; double x
-		 * = getX(p); if (x == this.getWidth()) return 5; double y = getY(x); double
-		 * dist = Math.sqrt((a - x) * (a - x) + (b - y) * (b - y)); return dist; }
-		 */
+		public double getAverageDistance() {
+			double sum = 0;
+			for (Point p : points)
+				sum += getDistance(p);
+			return (sum / points.size());
+		}
+
 	}
 
 }
