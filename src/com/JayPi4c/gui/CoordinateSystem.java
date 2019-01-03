@@ -51,7 +51,10 @@ public class CoordinateSystem extends JPanel implements MouseListener {
 				prev = p;
 			}
 		}
-
+		if (Logic.polynomial != null) {
+			g2d.setColor(Color.WHITE);
+			g2d.drawString(Logic.polynomial.getFormularFormatted(), 10, this.getHeight() - 10);
+		}
 		g.drawImage(buffer, 0, 0, null);
 	}
 

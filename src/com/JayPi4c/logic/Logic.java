@@ -10,12 +10,16 @@ public class Logic {
 
 	public static ArrayList<Point> points = new ArrayList<Point>();
 	public static Polynomial polynomial;
-	public static int degree;
-	public static boolean autoAdjusting = false;
+	public static int degree = 0;
 	public static int maxDegree = 8;
-	public static double threshold = 20;
+	public static int threshold = 20;
+	public static int iterations = 50;
+	public static boolean autoAdjusting = false;
+	public static boolean ignoreOutliers = false;
+	public static int ignoreCount = 0;
 
 	public static void calculateCoefficients() {
+
 		double b_data[] = new double[degree + 1];
 		for (int i = 0; i < b_data.length; i++) {
 			double sum = 0;
@@ -42,12 +46,13 @@ public class Logic {
 		polynomial = new Polynomial();
 		for (int i = 0; i < degree + 1; i++) {
 			Matrix m_ = m.copy().setColumn(i, b_data);
+			// Den Determinanten zu berechnen ist sehr zeitaufwendig und sollte evtl
+			// in der Matrix library überarbeitet werden
 			polynomial.add(polynomial.new Term(m_.det() / m.det(), i));
 		}
 		polynomial.combine();
 		polynomial.reorder();
 		polynomial.fill();
-
 	}
 
 	public static double getAverageDistance() {
@@ -73,7 +78,7 @@ public class Logic {
 		p1.combine();
 		p1.reorder();
 		p1.fill();
-		double root1 = p1.getRoot(a, 50);
+		double root1 = p1.getRoot(a, iterations);
 		double dist1 = Math
 				.sqrt((a - root1) * (a - root1) + (b - polynomial.getY(root1)) * (b - polynomial.getY(root1)));
 
@@ -87,7 +92,7 @@ public class Logic {
 		copy = polynomial.copy();
 		copy.mult(polynomial.getDerivation());
 		p2.add(copy);
-		double root2 = p2.getRoot(a, 50);
+		double root2 = p2.getRoot(a, iterations);
 
 		double dist2 = Math
 				.sqrt((a - root2) * (a - root2) + (b - polynomial.getY(root2)) * (b - polynomial.getY(root2)));
@@ -107,7 +112,7 @@ public class Logic {
 		} else {
 			calculateCoefficients();
 		}
-		polynomial.print();
+		// polynomial.print();
 
 	}
 
