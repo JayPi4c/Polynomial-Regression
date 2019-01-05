@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import com.JayPi4c.Matrix;
 import com.JayPi4c.Polynomial;
+import com.JayPi4c.Vector;
 
 public class Logic {
 
@@ -27,8 +28,7 @@ public class Logic {
 				sum += Math.pow(p.x, i) * p.y;
 			b_data[i] = sum;
 		}
-		Matrix b = new Matrix(b_data.length, 1);
-		b.setColumn(0, b_data);
+		Vector v = new Vector(b_data);
 
 		Matrix m = new Matrix(degree + 1, degree + 1);
 		for (int i = 0; i < degree + 1; i++) {
@@ -44,12 +44,17 @@ public class Logic {
 		}
 
 		polynomial = new Polynomial();
+		Vector coeffs = Matrix.getSolution(m, v);
+		double[] data = coeffs.getData();
 		for (int i = 0; i < degree + 1; i++) {
-			Matrix m_ = m.copy().setColumn(i, b_data);
-			// Den Determinanten zu berechnen ist sehr zeitaufwendig und sollte evtl
-			// in der Matrix library überarbeitet werden
-			polynomial.add(polynomial.new Term(m_.det() / m.det(), i));
+			polynomial.add(polynomial.new Term(data[i], i));
 		}
+		/*
+		 * for (int i = 0; i < degree + 1; i++) { Matrix m_ = m.copy().setColumn(i,
+		 * b_data); // Den Determinanten zu berechnen ist sehr zeitaufwendig und sollte
+		 * evtl // in der Matrix library überarbeitet werden
+		 * polynomial.add(polynomial.new Term(m_.det() / m.det(), i)); }
+		 */
 		polynomial.combine();
 		polynomial.reorder();
 		polynomial.fill();
