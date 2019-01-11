@@ -69,7 +69,7 @@ public class SettingsFrame extends JFrame {
 			setVisible(false);
 			dispose();
 			Logic.update();
-			Main.coordSys.repaint();
+			Frame.coordSys.repaint();
 		});
 		controlPanel.add(done);
 		this.add(controlPanel, BorderLayout.SOUTH);
