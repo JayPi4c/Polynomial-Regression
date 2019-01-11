@@ -74,7 +74,11 @@ public class Frame extends JFrame {
 			}
 		});
 
+		JMenuItem controlPoints = new JMenuItem("Control Points");
+		controlPoints.addActionListener(event -> new PointSettingsFrame(coordSys));
+
 		settings.add(setValues);
+		settings.add(controlPoints);
 		settings.add(window);
 		settings.addSeparator();
 		settings.add(ignoreOutliers);
