@@ -21,13 +21,12 @@ import javax.swing.WindowConstants;
 import javax.swing.event.HyperlinkEvent;
 
 import com.JayPi4c.Main;
-import com.JayPi4c.logic.Logic;
 
 public class Frame extends JFrame {
 
 	private static final long serialVersionUID = -208823195276469124L;
 
-	public static CoordinateSystem coordSys;
+	private CoordinateSystem coordSys;
 
 	public Frame() {
 		super(Main.messages.getString("MainFrame"));
@@ -42,9 +41,9 @@ public class Frame extends JFrame {
 		// anstelle von einer Ausgabe muss hier dann eine Funktion getriggert werden,
 		// die automatisch eine Auto-adjusting vornimmt.
 		autoAdjusting.addActionListener(event -> {
-			Logic.autoAdjusting = autoAdjusting.isSelected();
-			if (Logic.autoAdjusting && Logic.points.size() > 0) {
-				Logic.update();
+			coordSys.getLogic().autoAdjusting = autoAdjusting.isSelected();
+			if (coordSys.getLogic().autoAdjusting && coordSys.getLogic().points.size() > 0) {
+				coordSys.getLogic().update();
 				coordSys.repaint();
 			}
 		});
@@ -52,8 +51,8 @@ public class Frame extends JFrame {
 
 		JCheckBoxMenuItem ignoreOutliers = new JCheckBoxMenuItem("ignore outliers");
 		ignoreOutliers.addActionListener(event -> {
-			Logic.ignoreOutliers = ignoreOutliers.isSelected();
-			Logic.update();
+			coordSys.getLogic().ignoreOutliers = ignoreOutliers.isSelected();
+			coordSys.getLogic().update();
 			coordSys.repaint();
 		});
 		ignoreOutliers.setToolTipText("Yet to do");
@@ -62,15 +61,15 @@ public class Frame extends JFrame {
 		window.addActionListener(event -> System.out.println("Einstellen des Window"));
 
 		JMenuItem setValues = new JMenuItem(Main.messages.getString("setValues"));
-		setValues.addActionListener(event -> new SettingsFrame());
+		setValues.addActionListener(event -> new SettingsFrame(coordSys));
 
 		JMenuItem delPoints = new JMenuItem(Main.messages.getString("delPoints"));
 		delPoints.addActionListener(event -> {
 			int answer = JOptionPane.showConfirmDialog(null, Main.messages.getString("delMessage"),
 					Main.messages.getString("delPointsTitle"), JOptionPane.YES_NO_OPTION);
 			if (answer == JOptionPane.YES_OPTION) {
-				Logic.points = new ArrayList<Point>();
-				Logic.polynomial = null;
+				coordSys.getLogic().points = new ArrayList<Point>();
+				coordSys.getLogic().polynomial = null;
 				coordSys.repaint();
 			}
 		});

@@ -17,30 +17,32 @@ import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
 import com.JayPi4c.Main;
-import com.JayPi4c.logic.Logic;
 
 public class SettingsFrame extends JFrame {
 
 	private static final long serialVersionUID = -5987437176470122610L;
 
-	public SettingsFrame() {
+	CoordinateSystem coordSys;
+
+	public SettingsFrame(CoordinateSystem sys) {
 		super(Main.messages.getString("settings"));
+		coordSys = sys;
 
 		SettingsPanel degreePanel = new SettingsPanel(Main.messages.getString("degree"),
-				Main.messages.getString("degreeTooltip"), 0, Logic.maxDegree, Logic.degree);
-		degreePanel.addListener(event -> Logic.degree = degreePanel.getValue());
+				Main.messages.getString("degreeTooltip"), 0, coordSys.getLogic().maxDegree, coordSys.getLogic().degree);
+		degreePanel.addListener(event -> coordSys.getLogic().degree = degreePanel.getValue());
 		SettingsPanel thresholdPanel = new SettingsPanel(Main.messages.getString("threshold"),
-				Main.messages.getString("thresholdTooltip"), 1, 100, Logic.threshold);
-		thresholdPanel.addListener(event -> Logic.threshold = thresholdPanel.getValue());
+				Main.messages.getString("thresholdTooltip"), 1, 100, coordSys.getLogic().threshold);
+		thresholdPanel.addListener(event -> coordSys.getLogic().threshold = thresholdPanel.getValue());
 		SettingsPanel maxDegreePanel = new SettingsPanel(Main.messages.getString("maxDegree"),
-				Main.messages.getString("maxDegreeTooltip"), 1, 10, Logic.maxDegree);
-		maxDegreePanel.addListener(event -> Logic.maxDegree = maxDegreePanel.getValue());
+				Main.messages.getString("maxDegreeTooltip"), 1, 10, coordSys.getLogic().maxDegree);
+		maxDegreePanel.addListener(event -> coordSys.getLogic().maxDegree = maxDegreePanel.getValue());
 		SettingsPanel iterationsPanel = new SettingsPanel("Iterations", "je höher um so genauer, aber langsamer.", 1,
-				100, Logic.iterations);
-		iterationsPanel.addListener(event -> Logic.iterations = iterationsPanel.getValue());
+				100, coordSys.getLogic().iterations);
+		iterationsPanel.addListener(event -> coordSys.getLogic().iterations = iterationsPanel.getValue());
 		SettingsPanel ignoreCountPanel = new SettingsPanel("Ignore Count",
-				"Die Anzahl der Punkte die maximal ignoriert werden dürfen.", 0, 10, Logic.ignoreCount);
-		ignoreCountPanel.addListener(event -> Logic.ignoreCount = ignoreCountPanel.getValue());
+				"Die Anzahl der Punkte die maximal ignoriert werden dürfen.", 0, 10, coordSys.getLogic().ignoreCount);
+		ignoreCountPanel.addListener(event -> coordSys.getLogic().ignoreCount = ignoreCountPanel.getValue());
 
 		JPanel contentPanel = new JPanel();
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
@@ -68,8 +70,8 @@ public class SettingsFrame extends JFrame {
 		done.addActionListener(event -> {
 			setVisible(false);
 			dispose();
-			Logic.update();
-			Frame.coordSys.repaint();
+			coordSys.getLogic().update();
+			coordSys.repaint();
 		});
 		controlPanel.add(done);
 		this.add(controlPanel, BorderLayout.SOUTH);

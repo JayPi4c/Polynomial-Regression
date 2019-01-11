@@ -9,17 +9,17 @@ import com.JayPi4c.Vector;
 
 public class Logic {
 
-	public static ArrayList<Point> points = new ArrayList<Point>();
-	public static Polynomial polynomial;
-	public static int degree = 0;
-	public static int maxDegree = 8;
-	public static int threshold = 20;
-	public static int iterations = 50;
-	public static boolean autoAdjusting = false;
-	public static boolean ignoreOutliers = false;
-	public static int ignoreCount = 0;
+	public ArrayList<Point> points = new ArrayList<Point>();
+	public Polynomial polynomial;
+	public int degree = 0;
+	public int maxDegree = 8;
+	public int threshold = 20;
+	public int iterations = 50;
+	public boolean autoAdjusting = false;
+	public boolean ignoreOutliers = false;
+	public int ignoreCount = 0;
 
-	public static void calculateCoefficients() {
+	public void calculateCoefficients() {
 
 		double b_data[] = new double[degree + 1];
 		for (int i = 0; i < b_data.length; i++) {
@@ -60,14 +60,14 @@ public class Logic {
 		polynomial.fill();
 	}
 
-	public static double getAverageDistance() {
+	public double getAverageDistance() {
 		double sum = 0;
 		for (Point p : points)
 			sum += getDistance(p);
 		return (sum / points.size());
 	}
 
-	public static double getDistance(Point p) {
+	public double getDistance(Point p) {
 		double a = p.getX();
 		double b = p.getY();
 		double coeffs1[] = { a * a, -2 * a, 1, b * b };
@@ -105,7 +105,7 @@ public class Logic {
 		return Math.min(dist1, dist2);
 	}
 
-	public static void update() {
+	public void update() {
 		if (autoAdjusting) {
 			for (int i = 0; i <= Math.min(maxDegree, points.size() - 1); i++) {
 				degree = i;
@@ -123,15 +123,15 @@ public class Logic {
 
 	// ------------------HELPER-----------------
 
-	public static void addPoint(Point p) {
+	public void addPoint(Point p) {
 		points.add(p);
 	}
 
-	public static int getDegree() {
+	public int getDegree() {
 		return degree;
 	}
 
-	public static void setDegree(int d) {
+	public void setDegree(int d) {
 		degree = Math.min(maxDegree, d);
 	}
 
