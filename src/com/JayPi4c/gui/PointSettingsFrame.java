@@ -8,12 +8,16 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.Timer;
 import javax.swing.WindowConstants;
 
 public class PointSettingsFrame extends JFrame {
@@ -22,15 +26,22 @@ public class PointSettingsFrame extends JFrame {
 
 	private CoordinateSystem coordSys;
 
+	private JPanel contentPanel;
+	private JScrollPane scrollPane;
+	public static final int WIDTH = 200;
+	public static final int HEIGHT = 300;
+	public static final int INPUT_COLUMNS = 5;
+
 	public PointSettingsFrame(CoordinateSystem sys) {
 		super("Point Settings");
 		coordSys = sys;
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setPreferredSize(new Dimension(200, 300));
-		JPanel contentPanel = new JPanel();
+		scrollPane = new JScrollPane();
+		scrollPane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+
+		contentPanel = new JPanel();
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-		for (int i = 0; i < coordSys.getLogic().points.size(); i++)
-			contentPanel.add(new PointSettingsPanel(coordSys.getLogic().points, i));
+		loadComponents(0);
+
 		scrollPane.setViewportView(contentPanel);
 		this.setLayout(new BorderLayout());
 		this.add(scrollPane, BorderLayout.CENTER);
@@ -40,7 +51,34 @@ public class PointSettingsFrame extends JFrame {
 
 		JButton addButton = new JButton("Add");
 		addButton.addActionListener(event -> {
-			System.out.println("Frage mit OptionPane nach den Koordinaten des neuen Punktes");
+
+			JTextField xField = new JTextField(INPUT_COLUMNS);
+			JTextField yField = new JTextField(INPUT_COLUMNS);
+
+			JPanel myPanel = new JPanel();
+			myPanel.add(new JLabel("x:"));
+			myPanel.add(xField);
+			myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+			myPanel.add(new JLabel("y:"));
+			myPanel.add(yField);
+			int result = JOptionPane.showConfirmDialog(null, myPanel, "Please enter X and Y Coords",
+					JOptionPane.OK_CANCEL_OPTION);
+			int x, y;
+			if (result == JOptionPane.OK_OPTION) {
+				try {
+					x = Integer.parseInt(xField.getText());
+					y = Integer.parseInt(yField.getText());
+					coordSys.getLogic().addPoint(new Point(x, y));
+					contentPanel.add(new PointSettingsPanel(coordSys.getLogic().points,
+							coordSys.getLogic().points.size() - 1, this));
+					contentPanel.revalidate();
+					contentPanel.repaint();
+
+				} catch (NumberFormatException exc) {
+					JOptionPane.showMessageDialog(null, "Keine Zahlen eingegeben", "No Number Error",
+							JOptionPane.OK_OPTION);
+				}
+			}
 		});
 		addButton.setVisible(true);
 		controlPanel.add(addButton);
@@ -49,7 +87,8 @@ public class PointSettingsFrame extends JFrame {
 		done.addActionListener(event -> {
 			setVisible(false);
 			dispose();
-			coordSys.getLogic().update();
+			if (coordSys.getLogic().points.size() > 0)
+				coordSys.getLogic().update();
 			coordSys.repaint();
 		});
 		controlPanel.add(done);
@@ -63,11 +102,30 @@ public class PointSettingsFrame extends JFrame {
 
 	}
 
+	private void loadComponents(int start) {
+		for (int i = start; i < coordSys.getLogic().points.size(); i++)
+			contentPanel.add(new PointSettingsPanel(coordSys.getLogic().points, i, this));
+	}
+
+	public void deleteComponent(int index) {
+		for (int i = this.contentPanel.getComponentCount() - 1; i >= index; i--)
+			this.contentPanel.remove(i);
+		loadComponents(index);
+		this.contentPanel.revalidate();
+		this.contentPanel.repaint();
+	}
+
 	class PointSettingsPanel extends JPanel {
 
 		private static final long serialVersionUID = -6900549933290746043L;
 
-		public PointSettingsPanel(ArrayList<Point> points, int index) {
+		private PointSettingsFrame parent;
+		private int index;
+		public static final int TIMER_DELAY = 10;
+
+		public PointSettingsPanel(ArrayList<Point> points, int index, PointSettingsFrame parent) {
+			this.parent = parent;
+			this.index = index;
 			this.setSize(new Dimension(75, this.getHeight()));
 			this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.DARK_GRAY),
 					"Punkt #" + (index + 1)));
@@ -80,9 +138,24 @@ public class PointSettingsFrame extends JFrame {
 				points.remove(index);
 				button.setEnabled(false);
 				this.setEnabled(false);
+				this.slideOut();
 			});
 			this.add(button);
 			this.setVisible(true);
 		}
+
+		public void slideOut() {
+			new Timer(TIMER_DELAY, event -> {
+				int x = this.getX();
+				if (x <= parent.getX())
+					this.setLocation(x + 10, this.getY());
+				else {
+					((Timer) event.getSource()).stop();
+					parent.deleteComponent(index);
+				}
+				parent.repaint();
+			}).start();
+		}
+
 	}
 }

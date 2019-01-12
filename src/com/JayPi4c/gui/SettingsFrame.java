@@ -70,7 +70,8 @@ public class SettingsFrame extends JFrame {
 		done.addActionListener(event -> {
 			setVisible(false);
 			dispose();
-			coordSys.getLogic().update();
+			if (coordSys.getLogic().points.size() > 0)
+				coordSys.getLogic().update();
 			coordSys.repaint();
 		});
 		controlPanel.add(done);
