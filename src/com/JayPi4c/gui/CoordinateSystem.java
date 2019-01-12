@@ -3,7 +3,6 @@ package com.JayPi4c.gui;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -11,6 +10,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
 import com.JayPi4c.logic.Logic;
+import com.JayPi4c.logic.Point;
 
 public class CoordinateSystem extends JPanel implements MouseListener {
 
@@ -39,22 +39,25 @@ public class CoordinateSystem extends JPanel implements MouseListener {
 
 		// draw axis:
 		g2d.setColor(new Color(0, 0, 255));
-		g2d.drawLine(0, (int) (this.getHeight() * 0.5), this.getWidth(), (int) (this.getHeight() * 0.5));
-		g2d.drawLine((int) (this.getWidth() * 0.5), 0, (int) (this.getWidth() * 0.5), this.getHeight());
+		g2d.drawLine((int) getXPosInFrame(0), (int) getYPosInFrame(logic.y_max), (int) getXPosInFrame(0),
+				(int) getYPosInFrame(logic.y_min)); // y-axis
+		g2d.drawLine((int) getXPosInFrame(logic.x_min), (int) getYPosInFrame(0), (int) getXPosInFrame(logic.x_max),
+				(int) getYPosInFrame(0)); // x-axis
 
 		// draw the points:
 		g2d.setColor(new Color(200, 200, 200));
-		for (Point p : logic.points)
-			g2d.fillOval(p.x - r + (int) (this.getWidth() * 0.5), p.y * -1 - r + (int) (this.getHeight() * 0.5), r * 2,
-					r * 2);
+		for (Point p : logic.points) {
+			double x = getXPosInFrame(p.x) - r, y = getYPosInFrame(p.y) - r;
+			g2d.fillOval((int) x, (int) y, r * 2, r * 2);
+		}
 		if (logic.points.size() > logic.getDegree()) {
 			// draw the function:
 			g2d.setColor(new Color(0, 255, 0));
-			Point prev = new Point(-this.getWidth(), (int) logic.polynomial.getY(-this.getWidth()));
-			for (int i = -this.getWidth() + 1; i < this.getWidth() + 1; i++) {
-				Point p = new Point(i, (int) logic.polynomial.getY(i));
-				g2d.drawLine(prev.x + (int) (this.getWidth() * 0.5), prev.y * -1 + (int) (this.getHeight() * 0.5),
-						p.x + (int) (this.getWidth() * 0.5), p.y * -1 + (int) (this.getHeight() * 0.5));
+			Point prev = new Point(logic.x_min, logic.polynomial.getY(logic.x_min));
+			for (double i = logic.x_min + 0.001; i < logic.x_max; i += 0.001) {
+				Point p = new Point(i, logic.polynomial.getY(i));
+				g2d.drawLine((int) getXPosInFrame(prev.x), (int) getYPosInFrame(prev.y), (int) getXPosInFrame(p.x),
+						(int) getYPosInFrame(p.y));
 				prev = p;
 			}
 		}
@@ -65,10 +68,36 @@ public class CoordinateSystem extends JPanel implements MouseListener {
 		g.drawImage(buffer, 0, 0, null);
 	}
 
+	public double getXPosInFrame(double x) {
+		if (x < 0) {
+			return x / -logic.x_min * (this.getWidth() * 0.5) + this.getWidth() * 0.5;
+		} else {
+			return x / logic.x_max * (this.getWidth() * 0.5) + this.getWidth() * 0.5;
+		}
+	}
+
+	public double getYPosInFrame(double y) {
+		if (y < 0) {
+			return y * -1 / -logic.y_min * (this.getHeight() * 0.5) + this.getHeight() * 0.5;
+		} else {
+			return y * -1 / logic.y_max * (this.getHeight() * 0.5) + this.getHeight() * 0.5;
+		}
+	}
+
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		Point point = e.getPoint();
-		point.setLocation(point.x - this.getWidth() * 0.5, (point.y - this.getHeight() * 0.5) * -1);
+		Point point = new Point(e.getPoint().getX() - this.getWidth() * 0.5,
+				(e.getPoint().getY() - this.getHeight() * 0.5) * -1);
+		if (point.x < 0)
+			point.x = point.x / (this.getWidth() * 0.5) * -logic.x_min;
+		else
+			point.x = point.x / (this.getWidth() * 0.5) * logic.x_max;
+
+		if (point.y < 0)
+			point.y = point.y / (this.getHeight() * 0.5) * -logic.y_min;
+		else
+			point.y = point.y / (this.getHeight() * 0.5) * logic.y_max;
+
 		logic.points.add(point);
 		logic.update();
 		repaint();

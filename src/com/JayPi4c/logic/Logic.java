@@ -1,6 +1,5 @@
 package com.JayPi4c.logic;
 
-import java.awt.Point;
 import java.util.ArrayList;
 
 import com.JayPi4c.Matrix;
@@ -9,7 +8,7 @@ import com.JayPi4c.Vector;
 
 public class Logic {
 
-	public ArrayList<Point> points = new ArrayList<Point>();
+	public ArrayList<Point> points;
 	public Polynomial polynomial;
 	public int degree = 0;
 	public int maxDegree = 8;
@@ -18,6 +17,41 @@ public class Logic {
 	public boolean autoAdjusting = false;
 	public boolean ignoreOutliers = false;
 	public int ignoreCount = 0;
+	public double x_min = 0, x_max = 0;
+	public double y_min = 0, y_max = 0;
+
+	public Logic() {
+		points = new ArrayList<Point>();
+		calculateBounds();
+	}
+
+	public void calculateBounds() {
+		x_max = y_max = 1;
+		x_min = y_min = -1;
+
+		if (points.size() >= 1) {
+			for (Point p : points) {
+				if (p.x < 0) {
+					x_min = p.x;
+					x_max = -x_min;
+				} else {
+					x_max = p.x;
+					x_min = -x_max;
+				}
+				if (p.y < 0) {
+					y_min = p.y;
+					y_max = -y_min;
+				} else {
+					y_max = p.y;
+					y_min = -y_max;
+				}
+			}
+		}
+		x_min += 0.1 * x_min;
+		x_max += 0.1 * x_max;
+		y_min += 0.1 * y_min;
+		y_max += 0.1 * y_max;
+	}
 
 	public void calculateCoefficients() {
 

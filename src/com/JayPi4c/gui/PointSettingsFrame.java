@@ -4,7 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Point;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -19,6 +20,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
+
+import com.JayPi4c.logic.Point;
 
 public class PointSettingsFrame extends JFrame {
 
@@ -63,11 +66,11 @@ public class PointSettingsFrame extends JFrame {
 			myPanel.add(yField);
 			int result = JOptionPane.showConfirmDialog(null, myPanel, "Please enter X and Y Coords",
 					JOptionPane.OK_CANCEL_OPTION);
-			int x, y;
+			double x, y;
 			if (result == JOptionPane.OK_OPTION) {
 				try {
-					x = Integer.parseInt(xField.getText());
-					y = Integer.parseInt(yField.getText());
+					x = Double.parseDouble(xField.getText());
+					y = Double.parseDouble(yField.getText());
 					coordSys.getLogic().addPoint(new Point(x, y));
 					contentPanel.add(new PointSettingsPanel(coordSys.getLogic().points,
 							coordSys.getLogic().points.size() - 1, this));
@@ -87,8 +90,10 @@ public class PointSettingsFrame extends JFrame {
 		done.addActionListener(event -> {
 			setVisible(false);
 			dispose();
-			if (coordSys.getLogic().points.size() > 0)
+			if (coordSys.getLogic().points.size() > 0) {
+				coordSys.getLogic().calculateBounds();
 				coordSys.getLogic().update();
+			}
 			coordSys.repaint();
 		});
 		controlPanel.add(done);
@@ -131,7 +136,10 @@ public class PointSettingsFrame extends JFrame {
 					"Punkt #" + (index + 1)));
 			this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 			Point p = points.get(index);
-			JLabel label = new JLabel("( " + p.getX() + " | " + p.getY() + ")");
+
+			DecimalFormat df = new DecimalFormat("#.####");
+			df.setRoundingMode(RoundingMode.HALF_UP);
+			JLabel label = new JLabel("( " + df.format(p.getX()) + " | " + df.format(p.getY()) + ")");
 			this.add(label);
 			JButton button = new JButton("delete");
 			button.addActionListener(event -> {

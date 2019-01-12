@@ -2,7 +2,6 @@ package com.JayPi4c.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;
-import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -21,17 +20,22 @@ import javax.swing.WindowConstants;
 import javax.swing.event.HyperlinkEvent;
 
 import com.JayPi4c.Main;
+import com.JayPi4c.logic.Point;
 
 public class Frame extends JFrame {
 
 	private static final long serialVersionUID = -208823195276469124L;
 
+	public static final int WIDTH = 640;
+	public static final int HEIGHT = 480;
+
 	private CoordinateSystem coordSys;
 
 	public Frame() {
 		super(Main.messages.getString("MainFrame"));
-		setSize(640, 480);
+
 		coordSys = new CoordinateSystem();
+		setSize(WIDTH, HEIGHT);
 
 		// Menubaritems:
 		JMenu settings = new JMenu(Main.messages.getString("settings"));
