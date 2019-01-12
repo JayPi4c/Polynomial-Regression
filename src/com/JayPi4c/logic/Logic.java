@@ -31,17 +31,17 @@ public class Logic {
 
 		if (points.size() >= 1) {
 			for (Point p : points) {
-				if (p.x < 0) {
+				if (p.x < x_min && p.x < -x_max) {
 					x_min = p.x;
 					x_max = -x_min;
-				} else {
+				} else if (p.x > x_max && p.x > -x_min) {
 					x_max = p.x;
 					x_min = -x_max;
 				}
-				if (p.y < 0) {
+				if (p.y < y_min && p.y < -y_max) {
 					y_min = p.y;
 					y_max = -y_min;
-				} else {
+				} else if (p.y > y_max && p.y > -y_min) {
 					y_max = p.y;
 					y_min = -y_max;
 				}
