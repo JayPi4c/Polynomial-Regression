@@ -12,7 +12,7 @@ public class Logic {
 	public Polynomial polynomial;
 	public int degree = 0;
 	public int maxDegree = 8;
-	public int threshold = 20;
+	public double threshold = 0.3;
 	public int iterations = 50;
 	public boolean autoAdjusting = false;
 	public boolean ignoreOutliers = false;

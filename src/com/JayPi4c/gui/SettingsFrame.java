@@ -30,19 +30,19 @@ public class SettingsFrame extends JFrame {
 
 		SettingsPanel degreePanel = new SettingsPanel(Main.messages.getString("degree"),
 				Main.messages.getString("degreeTooltip"), 0, coordSys.getLogic().maxDegree, coordSys.getLogic().degree);
-		degreePanel.addListener(event -> coordSys.getLogic().degree = degreePanel.getValue());
+		degreePanel.addListener(event -> coordSys.getLogic().degree = (int) degreePanel.getValue());
 		SettingsPanel thresholdPanel = new SettingsPanel(Main.messages.getString("threshold"),
 				Main.messages.getString("thresholdTooltip"), 1, 100, coordSys.getLogic().threshold);
 		thresholdPanel.addListener(event -> coordSys.getLogic().threshold = thresholdPanel.getValue());
 		SettingsPanel maxDegreePanel = new SettingsPanel(Main.messages.getString("maxDegree"),
 				Main.messages.getString("maxDegreeTooltip"), 1, 10, coordSys.getLogic().maxDegree);
-		maxDegreePanel.addListener(event -> coordSys.getLogic().maxDegree = maxDegreePanel.getValue());
+		maxDegreePanel.addListener(event -> coordSys.getLogic().maxDegree = (int) maxDegreePanel.getValue());
 		SettingsPanel iterationsPanel = new SettingsPanel("Iterations", "je höher um so genauer, aber langsamer.", 1,
 				100, coordSys.getLogic().iterations);
-		iterationsPanel.addListener(event -> coordSys.getLogic().iterations = iterationsPanel.getValue());
+		iterationsPanel.addListener(event -> coordSys.getLogic().iterations = (int) iterationsPanel.getValue());
 		SettingsPanel ignoreCountPanel = new SettingsPanel("Ignore Count",
 				"Die Anzahl der Punkte die maximal ignoriert werden dürfen.", 0, 10, coordSys.getLogic().ignoreCount);
-		ignoreCountPanel.addListener(event -> coordSys.getLogic().ignoreCount = ignoreCountPanel.getValue());
+		ignoreCountPanel.addListener(event -> coordSys.getLogic().ignoreCount = (int) ignoreCountPanel.getValue());
 
 		JPanel contentPanel = new JPanel();
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
@@ -90,9 +90,9 @@ public class SettingsFrame extends JFrame {
 		JButton apply;
 
 		ActionListener al;
-		int current;
+		double current;
 
-		public SettingsPanel(String title, String toolTip, int min, int max, int current) {
+		public SettingsPanel(String title, String toolTip, int min, int max, double current) {
 			this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.DARK_GRAY), title));
 			this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 			this.setToolTipText(toolTip);
@@ -100,7 +100,7 @@ public class SettingsFrame extends JFrame {
 			// control the values in this panel:
 			JPanel inputPanel = new JPanel();
 			inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
-			JSlider slider = new JSlider(min, max, limit(current, min, max));
+			JSlider slider = new JSlider(min, max, (int) limit(current, min, max));
 			input = new JTextField(current + "");
 			slider.addChangeListener(event -> input.setText(slider.getValue() + ""));
 			input.setMaximumSize(new Dimension(200, (int) input.getPreferredSize().getHeight()));
@@ -125,7 +125,7 @@ public class SettingsFrame extends JFrame {
 
 		}
 
-		public int limit(int value, int min, int max) {
+		public double limit(double value, double min, double max) {
 			return Math.max(min, Math.min(value, max));
 		}
 
@@ -138,9 +138,9 @@ public class SettingsFrame extends JFrame {
 			apply.addActionListener(al);
 		}
 
-		int getValue() {
+		double getValue() {
 			try {
-				return Integer.parseInt(input.getText());
+				return Double.parseDouble(input.getText());
 			} catch (NumberFormatException e) {
 				return current;
 			}
