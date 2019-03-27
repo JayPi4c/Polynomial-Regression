@@ -31,7 +31,7 @@ public class PointSettingsFrame extends JFrame {
 
 	private JPanel contentPanel;
 	private JScrollPane scrollPane;
-	public static final int WIDTH = 200;
+	public static final int WIDTH = 220;
 	public static final int HEIGHT = 300;
 	public static final int INPUT_COLUMNS = 5;
 
@@ -132,6 +132,10 @@ public class PointSettingsFrame extends JFrame {
 			this.parent = parent;
 			this.index = index;
 			this.setSize(new Dimension(75, this.getHeight()));
+			if (coordSys.getLogic().unignoredPoints.size() != 0)
+				this.setBackground(
+						coordSys.getLogic().unignoredPoints.contains(points.get(index)) ? this.getBackground()
+								: Color.RED);
 			this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.DARK_GRAY),
 					"Punkt #" + (index + 1)));
 			this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));

@@ -56,8 +56,11 @@ public class Frame extends JFrame {
 		JCheckBoxMenuItem ignoreOutliers = new JCheckBoxMenuItem("ignore outliers");
 		ignoreOutliers.addActionListener(event -> {
 			coordSys.getLogic().ignoreOutliers = ignoreOutliers.isSelected();
-			coordSys.getLogic().update();
-			coordSys.repaint();
+			if (coordSys.getLogic().points.size() > 0) {
+				coordSys.getLogic().unignoredPoints = new ArrayList<Point>();
+				coordSys.getLogic().update();
+				coordSys.repaint();
+			}
 		});
 		ignoreOutliers.setToolTipText("Yet to do");
 
