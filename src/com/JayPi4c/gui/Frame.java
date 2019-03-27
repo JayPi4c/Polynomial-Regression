@@ -119,7 +119,7 @@ public class Frame extends JFrame {
 					+ "Please visit this website for the mathematics behind this program:<br>"
 					+ "<a href=\"https://neutrium.net/mathematics/least-squares-fitting-of-a-polynomial/\">neutrium.net</a><br>"
 					+ "Find this project on GitHub:<br>"
-					+ "<a href=\"github.com/JayPi4c/Polynomial_Regression/\">GitHub.com</a><br>" + "~JayPi4c");
+					+ "<a href=\"https://github.com/JayPi4c/Polynomial-Regression/\">GitHub.com</a><br>" + "~JayPi4c");
 
 			ep.addHyperlinkListener(e -> {
 				if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
