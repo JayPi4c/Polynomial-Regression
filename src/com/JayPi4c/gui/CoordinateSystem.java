@@ -5,6 +5,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
@@ -12,7 +15,7 @@ import javax.swing.JPanel;
 import com.JayPi4c.logic.Logic;
 import com.JayPi4c.logic.Point;
 
-public class CoordinateSystem extends JPanel implements MouseListener {
+public class CoordinateSystem extends JPanel implements MouseListener, MouseWheelListener, MouseMotionListener {
 
 	private static final long serialVersionUID = 1000943736638858551L;
 
@@ -20,10 +23,15 @@ public class CoordinateSystem extends JPanel implements MouseListener {
 
 	private Logic logic;
 
+	private java.awt.Point beginMovingPoint = null;
+	private java.awt.Point endMovingPoint = null;
+
 	public CoordinateSystem() {
 		this.logic = new Logic();
 		this.setFocusable(true);
 		this.addMouseListener(this);
+		this.addMouseWheelListener(this);
+		this.addMouseMotionListener(this);
 	}
 
 	public Logic getLogic() {
@@ -86,21 +94,12 @@ public class CoordinateSystem extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		Point point = new Point(e.getPoint().getX() - this.getWidth() * 0.5,
-				(e.getPoint().getY() - this.getHeight() * 0.5) * -1);
-		if (point.x < 0)
-			point.x = point.x / (this.getWidth() * 0.5) * -logic.x_min;
-		else
-			point.x = point.x / (this.getWidth() * 0.5) * logic.x_max;
-
-		if (point.y < 0)
-			point.y = point.y / (this.getHeight() * 0.5) * -logic.y_min;
-		else
-			point.y = point.y / (this.getHeight() * 0.5) * logic.y_max;
-
-		logic.points.add(point);
-		logic.update();
-		repaint();
+		endMovingPoint = e.getPoint();
+		Point vector = new Point(endMovingPoint.getX() - beginMovingPoint.getX(),
+				endMovingPoint.getY() - beginMovingPoint.getY());
+		// logic.move(vector);
+		// logic.update();
+		// repaint();
 	}
 
 	@Override
@@ -115,11 +114,34 @@ public class CoordinateSystem extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-
+		Point point = logic.getScaledPoint(e.getPoint(), getWidth(), getHeight());
+		logic.points.add(point);
+		logic.update();
+		repaint();
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		beginMovingPoint = e.getPoint();
+	}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		java.awt.Point p = e.getPoint();
+		System.out.print("x:" + p.getX() + " y:" + p.getY());
+		Point pt = logic.getScaledPoint(p, getWidth(), getHeight());
+		System.out.println("->   x:" + pt.getX() + " y:" + pt.getY());
+
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		// damit sich der Frame flüssig verschiebt, muss in dieser Funktion das
+		// Koordsystem immer wieder neu berechnet und gezeichnet werden.
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
 
 	}
 

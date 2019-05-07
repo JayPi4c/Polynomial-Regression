@@ -211,6 +211,27 @@ public class Logic {
 
 	}
 
+	public Point getScaledPoint(java.awt.Point p, int width, int height) {
+		Point point = new Point(p.getX() - width * 0.5, (p.getY() - height * 0.5) * -1);
+		if (point.x < 0)
+			point.x = point.x / (width * 0.5) * -x_min;
+		else
+			point.x = point.x / (width * 0.5) * x_max;
+
+		if (point.y < 0)
+			point.y = point.y / (height * 0.5) * -y_min;
+		else
+			point.y = point.y / (height * 0.5) * y_max;
+		return point;
+	}
+
+	public void move(Point vec) {
+		x_min += vec.getX();
+		x_max += vec.getX();
+		y_min += vec.getY();
+		y_max += vec.getY();
+	}
+
 	// ------------------HELPER-----------------
 
 	public void addPoint(Point p) {
