@@ -27,6 +27,10 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 	public static final int WIDTH = 640;
 	public static final int HEIGHT = 480;
 
+	// mit diesem Punkt wird festgestellt, in welchem Vektor sich das
+	// Koordinaten-System verschiebt
+	private Point startPos = null;
+
 	private boolean drawHints;
 	private double pos_x_axis, neg_x_axis, pos_y_axis, neg_y_axis;
 	private double x_steps, y_steps;
@@ -73,10 +77,8 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 		proportion = pos_y_axis / (pos_y_axis + neg_y_axis);
 		g2d.drawLine(0, (int) (HEIGHT * proportion), WIDTH, (int) (HEIGHT * proportion));
 
-		if (drawHints) {
+		if (drawHints)
 			drawHints(g2d);
-			// TODO: implement draw Hints function
-		}
 
 		// draw the points:
 		drawPoints(g2d);
@@ -186,49 +188,95 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 		return new Point(x_out, y_out);
 	}
 
+	public void resizeWindow(Point p) {
+		if (p.getX() < -1 * neg_x_axis)
+			neg_x_axis = p.getX() + neg_x_axis * 0.01;
+		else if (p.getX() > pos_x_axis)
+			pos_x_axis = p.getX() + pos_x_axis * 0.01;
+		if (p.getY() < -1 * neg_y_axis)
+			neg_y_axis = p.getY() + neg_y_axis * 0.01;
+		else if (p.getY() > pos_y_axis)
+			pos_y_axis = p.getY() + pos_y_axis * 0.01;
+
+	}
+
+	private void moveSystem(double xOffset, double yOffset) {
+		neg_x_axis -= xOffset;
+		pos_x_axis += xOffset;
+		neg_y_axis -= yOffset;
+		pos_y_axis += yOffset;
+	}
+
+//TODO: mousePressed started -> mouseDragged update -> mouseReleased nutzen, um CoordSys zu verschieben
 	@Override
 	public void mouseReleased(MouseEvent e) {
+
+		if (startPos != null) {
+			Point endPos = getPoint(e.getX(), e.getY());
+			double xOff = startPos.getX() - endPos.getX();
+			double yOff = startPos.getY() - endPos.getY();
+			startPos = null;
+			moveSystem(xOff, yOff);
+			repaint();
+		}
 
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		logic.points.add(getPoint(e.getX(), e.getY()));
+		Point p;
+		logic.points.add(p = getPoint(e.getX(), e.getY()));
 		logic.update();
+		resizeWindow(p);
 		repaint();
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		startPos = getPoint(e.getX(), e.getY());
 	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		// damit sich der Frame flüssig verschiebt, muss in dieser Funktion das
-		// Koordsystem immer wieder neu berechnet und gezeichnet werden.
+		// Mit dieser Funktion stimmt irgendetwas noch nicht so ganz. ist dieser Teil im
+		// Programm implementiert, das verschieben goes crazy
+		/*
+		 * if (startPos != null) { Point endPos = getPoint(e.getX(), e.getY()); double
+		 * xOff = startPos.getX() - endPos.getX(); double yOff = startPos.getY() -
+		 * endPos.getY(); startPos = endPos; moveSystem(xOff, yOff); repaint();
+		 * 
+		 * }
+		 */
+
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-
 	}
 
-	public static final double map(double value, double istart, double istop, double ostart, double ostop) {
+	/**
+	 * copied from Processing.org
+	 * 
+	 * @param value
+	 * @param istart
+	 * @param istop
+	 * @param ostart
+	 * @param ostop
+	 * @return
+	 */
+	private static final double map(double value, double istart, double istop, double ostart, double ostop) {
 		return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 	}
 
