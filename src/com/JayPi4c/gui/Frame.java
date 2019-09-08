@@ -26,16 +26,12 @@ public class Frame extends JFrame {
 
 	private static final long serialVersionUID = -208823195276469124L;
 
-	public static final int WIDTH = 640;
-	public static final int HEIGHT = 480;
-
 	private CoordinateSystem coordSys;
 
 	public Frame() {
 		super(Main.messages.getString("MainFrame"));
 
 		coordSys = new CoordinateSystem();
-		setSize(WIDTH, HEIGHT);
 
 		// Menubaritems:
 		JMenu settings = new JMenu(Main.messages.getString("settings"));
@@ -150,7 +146,7 @@ public class Frame extends JFrame {
 
 		setLayout(new BorderLayout());
 		add(coordSys, BorderLayout.CENTER);
-
+		pack();
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setResizable(false);

@@ -18,41 +18,10 @@ public class Logic {
 	public boolean autoAdjusting = false;
 	public boolean ignoreOutliers = false;
 	public int ignoreCount = 1;
-	public double x_min = 0, x_max = 0;
-	public double y_min = 0, y_max = 0;
 
 	public Logic() {
 		points = new ArrayList<Point>();
 		unignoredPoints = new ArrayList<Point>();
-		calculateBounds();
-	}
-
-	public void calculateBounds() {
-		x_max = y_max = 1;
-		x_min = y_min = -1;
-
-		if (points.size() >= 1) {
-			for (Point p : points) {
-				if (p.x < x_min && p.x < -x_max) {
-					x_min = p.x;
-					x_max = -x_min;
-				} else if (p.x > x_max && p.x > -x_min) {
-					x_max = p.x;
-					x_min = -x_max;
-				}
-				if (p.y < y_min && p.y < -y_max) {
-					y_min = p.y;
-					y_max = -y_min;
-				} else if (p.y > y_max && p.y > -y_min) {
-					y_max = p.y;
-					y_min = -y_max;
-				}
-			}
-		}
-		x_min += 0.1 * x_min;
-		x_max += 0.1 * x_max;
-		y_min += 0.1 * y_min;
-		y_max += 0.1 * y_max;
 	}
 
 	public Polynomial calculateCoefficients(ArrayList<Point> ps) {
@@ -61,7 +30,7 @@ public class Logic {
 		for (int i = 0; i < b_data.length; i++) {
 			double sum = 0;
 			for (Point p : ps)
-				sum += Math.pow(p.x, i) * p.y;
+				sum += Math.pow(p.getX(), i) * p.getY();
 			b_data[i] = sum;
 		}
 		Vector v = new Vector(b_data);
@@ -72,7 +41,7 @@ public class Logic {
 			for (int j = 0; j < degree + 1; j++) {
 				double sum = 0;
 				for (Point p : ps) {
-					sum += Math.pow(p.x, i + j);
+					sum += Math.pow(p.getX(), i + j);
 				}
 				row[j] = sum;
 			}
@@ -209,27 +178,6 @@ public class Logic {
 		}
 		// polynomial.print();
 
-	}
-
-	public Point getScaledPoint(java.awt.Point p, int width, int height) {
-		Point point = new Point(p.getX() - width * 0.5, (p.getY() - height * 0.5) * -1);
-		if (point.x < 0)
-			point.x = point.x / (width * 0.5) * -x_min;
-		else
-			point.x = point.x / (width * 0.5) * x_max;
-
-		if (point.y < 0)
-			point.y = point.y / (height * 0.5) * -y_min;
-		else
-			point.y = point.y / (height * 0.5) * y_max;
-		return point;
-	}
-
-	public void move(Point vec) {
-		x_min += vec.getX();
-		x_max += vec.getX();
-		y_min += vec.getY();
-		y_max += vec.getY();
 	}
 
 	// ------------------HELPER-----------------

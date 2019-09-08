@@ -91,7 +91,6 @@ public class PointSettingsFrame extends JFrame {
 			setVisible(false);
 			dispose();
 			if (coordSys.getLogic().points.size() > 0) {
-				coordSys.getLogic().calculateBounds();
 				coordSys.getLogic().update();
 			}
 			coordSys.repaint();
