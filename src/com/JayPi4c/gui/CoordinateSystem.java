@@ -31,9 +31,9 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 	// Koordinaten-System verschiebt
 	private Point startPos = null;
 
-	private boolean drawHints;
-	private double pos_x_axis, neg_x_axis, pos_y_axis, neg_y_axis;
-	private double x_steps, y_steps;
+	public boolean drawHints;
+	public double pos_x_axis, neg_x_axis, pos_y_axis, neg_y_axis;
+	public double x_steps, y_steps;
 
 	public CoordinateSystem() {
 		this(10, 10, 10, 10);
@@ -207,7 +207,8 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 		pos_y_axis += yOffset;
 	}
 
-//TODO: mousePressed started -> mouseDragged update -> mouseReleased nutzen, um CoordSys zu verschieben
+	// TODO: mousePressed started -> mouseDragged update -> mouseReleased nutzen, um
+	// CoordSys zu verschieben
 	@Override
 	public void mouseReleased(MouseEvent e) {
 

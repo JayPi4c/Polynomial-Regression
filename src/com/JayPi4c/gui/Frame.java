@@ -16,6 +16,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.HyperlinkEvent;
 
@@ -60,11 +61,29 @@ public class Frame extends JFrame {
 		});
 		ignoreOutliers.setToolTipText("Yet to do");
 
+		JCheckBoxMenuItem showHints = new JCheckBoxMenuItem("show Hints");
+		showHints.setSelected(coordSys.drawHints);
+		showHints.addActionListener(event -> {
+			coordSys.drawHints = showHints.isSelected();
+			coordSys.repaint();
+		});
+		showHints.setToolTipText("show hints");
+
 		JMenuItem window = new JMenuItem(Main.messages.getString("changeWindow"));
-		window.addActionListener(event -> System.out.println("Einstellen des Window"));
+		window.addActionListener(event -> SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new WindowSettingsFrame(coordSys);
+			}
+		}));
 
 		JMenuItem setValues = new JMenuItem(Main.messages.getString("setValues"));
-		setValues.addActionListener(event -> new SettingsFrame(coordSys));
+		setValues.addActionListener(event -> SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new SettingsFrame(coordSys);
+			}
+		}));
 
 		JMenuItem delPoints = new JMenuItem(Main.messages.getString("delPoints"));
 		delPoints.addActionListener(event -> {
@@ -84,6 +103,7 @@ public class Frame extends JFrame {
 		settings.add(controlPoints);
 		settings.add(window);
 		settings.addSeparator();
+		settings.add(showHints);
 		settings.add(ignoreOutliers);
 		settings.add(autoAdjusting);
 		settings.addSeparator();
