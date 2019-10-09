@@ -71,7 +71,9 @@ public class PointSettingsFrame extends JFrame {
 				try {
 					x = Double.parseDouble(xField.getText());
 					y = Double.parseDouble(yField.getText());
-					coordSys.getLogic().addPoint(new Point(x, y));
+					Point p;
+					coordSys.getLogic().addPoint(p = new Point(x, y));
+					coordSys.resizeWindow(p);
 					contentPanel.add(new PointSettingsPanel(coordSys.getLogic().points,
 							coordSys.getLogic().points.size() - 1, this));
 					contentPanel.revalidate();
@@ -91,7 +93,6 @@ public class PointSettingsFrame extends JFrame {
 			setVisible(false);
 			dispose();
 			if (coordSys.getLogic().points.size() > 0) {
-				coordSys.getLogic().calculateBounds();
 				coordSys.getLogic().update();
 			}
 			coordSys.repaint();
