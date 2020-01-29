@@ -61,21 +61,22 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 
 	@Override
 	public void paint(Graphics g) {
-		BufferedImage buffer = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+		int w = this.getWidth(), h = this.getHeight();
+		BufferedImage buffer = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2d = (Graphics2D) buffer.getGraphics();
 		g2d.setColor(new Color(51, 51, 51));
-		g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
+		g2d.fillRect(0, 0, w, h);
 
 		// draw axis:
 		g2d.setColor(new Color(0, 0, 255));
 
 		// draw y-axis
 		double proportion = neg_x_axis / (pos_x_axis + neg_x_axis);
-		g2d.drawLine((int) (WIDTH * proportion), 0, (int) (WIDTH * proportion), HEIGHT);
+		g2d.drawLine((int) (w * proportion), 0, (int) (w * proportion), h);
 
 		// draw x-axis
 		proportion = pos_y_axis / (pos_y_axis + neg_y_axis);
-		g2d.drawLine(0, (int) (HEIGHT * proportion), WIDTH, (int) (HEIGHT * proportion));
+		g2d.drawLine(0, (int) (h * proportion), w, (int) (h * proportion));
 
 		if (drawHints)
 			drawHints(g2d);
@@ -89,17 +90,18 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 		// draw the function as text
 		if (logic.polynomial != null) {
 			g2d.setColor(Color.WHITE);
-			g2d.drawString(logic.polynomial.getFormularFormatted(), 10, this.getHeight() - 10);
+			g2d.drawString(logic.polynomial.getFormularFormatted(), 10, h - 10);
 		}
 		g.drawImage(buffer, 0, 0, null);
 	}
 
 	private void drawHints(Graphics2D g2d) {
-		double originX = WIDTH * (neg_x_axis / (pos_x_axis + neg_x_axis));
-		double originY = HEIGHT * (pos_y_axis / (pos_y_axis + neg_y_axis));
+		int w = this.getWidth(), h = this.getHeight();
+		double originX = w * (neg_x_axis / (pos_x_axis + neg_x_axis));
+		double originY = h * (pos_y_axis / (pos_y_axis + neg_y_axis));
 		// x axis
 		double proportion = x_steps / (pos_x_axis + neg_x_axis);
-		double part = WIDTH * proportion;
+		double part = w * proportion;
 		// neg part of x axis
 		for (int i = 1; i <= (neg_x_axis / x_steps); i++) {
 			double x = originX - i * part;
@@ -113,7 +115,7 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 		}
 		// y axis
 		proportion = y_steps / (pos_y_axis + neg_y_axis);
-		part = HEIGHT * proportion;
+		part = h * proportion;
 		// neg part of y axis
 		for (int i = 1; i <= (neg_y_axis / y_steps); i++) {
 			double y = originY + i * part;
@@ -152,38 +154,40 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 	}
 
 	private Point convertPoint(Point p) {
-		double originX = WIDTH * (neg_x_axis / (pos_x_axis + neg_x_axis));
-		double originY = HEIGHT * (pos_y_axis / (pos_y_axis + neg_y_axis));
+		int w = this.getWidth(), h = this.getHeight();
+		double originX = w * (neg_x_axis / (pos_x_axis + neg_x_axis));
+		double originY = h * (pos_y_axis / (pos_y_axis + neg_y_axis));
 		double x = p.getX();
 		double x_out;
 		if (x < 0)
 			x_out = map(x, -1 * neg_x_axis, 0, 0, originX);
 		else
-			x_out = map(x, 0, pos_x_axis, originX, WIDTH);
+			x_out = map(x, 0, pos_x_axis, originX, w);
 		double y_out;
 		double y = p.getY();
 		if (y < 0)
 			y_out = map(y, pos_y_axis, 0, 0, originY);
 		else
-			y_out = map(y, 0, -1 * neg_y_axis, originY, HEIGHT);
+			y_out = map(y, 0, -1 * neg_y_axis, originY, h);
 		return new Point(x_out, y_out);
 	}
 
 	private Point getPoint(double x, double y) {
-		double originX = WIDTH * (neg_x_axis / (pos_x_axis + neg_x_axis));
-		double originY = HEIGHT * (pos_y_axis / (pos_y_axis + neg_y_axis));
+		int w = this.getWidth(), h = this.getHeight();
+		double originX = w * (neg_x_axis / (pos_x_axis + neg_x_axis));
+		double originY = h * (pos_y_axis / (pos_y_axis + neg_y_axis));
 
 		double x_out;
 		if (x < originX)
 
 			x_out = map(x, 0, originX, -1 * neg_x_axis, 0);
 		else
-			x_out = map(x, originX, WIDTH, 0, pos_x_axis);
+			x_out = map(x, originX, w, 0, pos_x_axis);
 		double y_out;
 		if (y < originY)
 			y_out = map(y, 0, originY, pos_y_axis, 0);
 		else
-			y_out = map(y, originY, HEIGHT, 0, -1 * neg_y_axis);
+			y_out = map(y, originY, h, 0, -1 * neg_y_axis);
 
 		return new Point(x_out, y_out);
 	}
