@@ -16,26 +16,36 @@ public class WindowSettingsFrame extends JFrame implements ILocaleChangeListener
 
 	CoordinateSystem coordSys;
 
+	private JButton done;
+	private SettingsPanel neg_x_axisPanel;
+	private SettingsPanel pos_x_axisPanel;
+	private SettingsPanel neg_y_axisPanel;
+	private SettingsPanel pos_y_axisPanel;
+	private SettingsPanel xHintSpacerPanel;
+	private SettingsPanel yHintSpacerPanel;
+	private JButton apply;
+
 	public WindowSettingsFrame(CoordinateSystem sys) {
-		super("alpha" + Messages.getString("settings"));
+		super(Messages.getString("WindowSettingsFrame.title"));
 		coordSys = sys;
 
-		SettingsPanel neg_x_axisPanel = new SettingsPanel(Messages.getString("negXAxis"),
-				Messages.getString("negXAxisTooltip"), -100, 0, coordSys.neg_x_axis);
+		neg_x_axisPanel = new SettingsPanel(Messages.getString("WindowSettingsFrame.negXAxis"),
+				Messages.getString("WindowSettingsFrame.negXAxis.toolTip"), -100, 0, coordSys.neg_x_axis);
 		neg_x_axisPanel.addListener(event -> coordSys.neg_x_axis = Math.abs(neg_x_axisPanel.getValue()));
-		SettingsPanel pos_x_axisPanel = new SettingsPanel(Messages.getString("posXAxis"),
-				Messages.getString("posXAxisTooltip"), 0, 100, coordSys.pos_x_axis);
+		pos_x_axisPanel = new SettingsPanel(Messages.getString("WindowSettingsFrame.posXAxis"),
+				Messages.getString("WindowSettingsFrame.posXAxis.toolTip"), 0, 100, coordSys.pos_x_axis);
 		pos_x_axisPanel.addListener(event -> coordSys.pos_x_axis = pos_x_axisPanel.getValue());
-		SettingsPanel neg_y_axisPanel = new SettingsPanel(Messages.getString("negYAxis"),
-				Messages.getString("negYAxisTooltip"), -100, 0, coordSys.neg_y_axis);
+		neg_y_axisPanel = new SettingsPanel(Messages.getString("WindowSettingsFrame.negYAxis"),
+				Messages.getString("WindowSettingsFrame.negYAxis.toolTip"), -100, 0, coordSys.neg_y_axis);
 		neg_y_axisPanel.addListener(event -> coordSys.neg_y_axis = Math.abs(neg_y_axisPanel.getValue()));
-		SettingsPanel pos_y_axisPanel = new SettingsPanel("pos-y-axis", "posYAxisTooltip", 0, 100, coordSys.pos_y_axis);
+		pos_y_axisPanel = new SettingsPanel(Messages.getString("WindowSettingsFrame.posYAxis"),
+				Messages.getString("WindowSettingsFrame.posYAxis.toolTip"), 0, 100, coordSys.pos_y_axis);
 		pos_y_axisPanel.addListener(event -> coordSys.pos_y_axis = pos_y_axisPanel.getValue());
-		SettingsPanel xHintSpacerPanel = new SettingsPanel("xHintSpacer", "Der Platz zwischen den xHints", 0, 50,
-				coordSys.x_steps);
+		xHintSpacerPanel = new SettingsPanel(Messages.getString("WindowSettingsFrame.xHintSpacer"),
+				Messages.getString("WindowSettingsFrame.xHintSpacer.toolTip"), 0, 50, coordSys.x_steps);
 		xHintSpacerPanel.addListener(event -> coordSys.x_steps = xHintSpacerPanel.getValue());
-		SettingsPanel yHintSpacerPanel = new SettingsPanel("yHintSpacer", "Der Platz zwischen den yHints", 0, 50,
-				coordSys.y_steps);
+		yHintSpacerPanel = new SettingsPanel(Messages.getString("WindowSettingsFrame.yHintSpacer"),
+				Messages.getString("WindowSettingsFrame.yHintSpacer.toolTip"), 0, 50, coordSys.y_steps);
 		yHintSpacerPanel.addListener(event -> coordSys.y_steps = yHintSpacerPanel.getValue());
 
 		JPanel contentPanel = new JPanel();
@@ -52,7 +62,7 @@ public class WindowSettingsFrame extends JFrame implements ILocaleChangeListener
 		this.add(contentPanel, BorderLayout.CENTER);
 		JPanel controlPanel = new JPanel();
 		controlPanel.setLayout(new FlowLayout());
-		JButton apply = new JButton(Messages.getString("applyAll"));
+		apply = new JButton(Messages.getString("WindowSettingsFrame.applyAll"));
 		apply.addActionListener(event -> {
 			for (Component c : contentPanel.getComponents()) {
 				SettingsPanel sp = (SettingsPanel) (c);
@@ -61,7 +71,7 @@ public class WindowSettingsFrame extends JFrame implements ILocaleChangeListener
 
 		});
 		controlPanel.add(apply);
-		JButton done = new JButton("done");
+		done = new JButton(Messages.getString("WindowSettingsFrame.done"));
 		done.addActionListener(event -> {
 			setVisible(false);
 			dispose();
@@ -82,7 +92,8 @@ public class WindowSettingsFrame extends JFrame implements ILocaleChangeListener
 
 	@Override
 	public void onLocaleChange() {
-		// TODO Auto-generated method stub
+		this.setTitle(Messages.getString("WindowSettingsFrame.title"));
+		neg_x_axisPanel.setToolTipText(Messages.getString("WindowSettingsFrame.negXAxis"));
 
 	}
 }

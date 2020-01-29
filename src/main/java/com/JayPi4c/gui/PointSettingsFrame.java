@@ -20,10 +20,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
+import javax.swing.border.TitledBorder;
 
 import com.JayPi4c.logic.Point;
 
-public class PointSettingsFrame extends JFrame {
+public class PointSettingsFrame extends JFrame implements ILocaleChangeListener {
 
 	private static final long serialVersionUID = -1864802896071899983L;
 
@@ -35,8 +36,13 @@ public class PointSettingsFrame extends JFrame {
 	public static final int HEIGHT = 300;
 	public static final int INPUT_COLUMNS = 5;
 
+	// GUI elements:
+	private JButton done;
+	private JPanel controlPanel;
+	private JButton addButton;
+
 	public PointSettingsFrame(CoordinateSystem sys) {
-		super("Point Settings");
+		super(Messages.getString("PointSettingsFrame.title"));
 		coordSys = sys;
 		scrollPane = new JScrollPane();
 		scrollPane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -49,10 +55,10 @@ public class PointSettingsFrame extends JFrame {
 		this.setLayout(new BorderLayout());
 		this.add(scrollPane, BorderLayout.CENTER);
 
-		JPanel controlPanel = new JPanel();
+		controlPanel = new JPanel();
 		controlPanel.setLayout(new FlowLayout());
 
-		JButton addButton = new JButton("Add");
+		addButton = new JButton(Messages.getString("PointSettingsFrame.add"));
 		addButton.addActionListener(event -> {
 
 			JTextField xField = new JTextField(INPUT_COLUMNS);
@@ -64,8 +70,8 @@ public class PointSettingsFrame extends JFrame {
 			myPanel.add(Box.createHorizontalStrut(15)); // a spacer
 			myPanel.add(new JLabel("y:"));
 			myPanel.add(yField);
-			int result = JOptionPane.showConfirmDialog(null, myPanel, "Please enter X and Y Coords",
-					JOptionPane.OK_CANCEL_OPTION);
+			int result = JOptionPane.showConfirmDialog(null, myPanel,
+					Messages.getString("PointSettingsFrame.inputDialog"), JOptionPane.OK_CANCEL_OPTION);
 			double x, y;
 			if (result == JOptionPane.OK_OPTION) {
 				try {
@@ -80,15 +86,15 @@ public class PointSettingsFrame extends JFrame {
 					contentPanel.repaint();
 
 				} catch (NumberFormatException exc) {
-					JOptionPane.showMessageDialog(null, "Keine Zahlen eingegeben", "No Number Error",
-							JOptionPane.OK_OPTION);
+					JOptionPane.showMessageDialog(null, Messages.getString("PointSettingsFrame.error"),
+							Messages.getString("PointSettingsFrame.errorTitle"), JOptionPane.OK_OPTION);
 				}
 			}
 		});
 		addButton.setVisible(true);
 		controlPanel.add(addButton);
 
-		JButton done = new JButton("Done");
+		done = new JButton(Messages.getString("PointSettingsFrame.done"));
 		done.addActionListener(event -> {
 			setVisible(false);
 			dispose();
@@ -105,7 +111,15 @@ public class PointSettingsFrame extends JFrame {
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.setVisible(true);
+		Messages.registerListener(this);
 
+	}
+
+	@Override
+	public void onLocaleChange() {
+		this.setTitle(Messages.getString("PointSettingsFrame.title"));
+		addButton.setText(Messages.getString("PointSettingsFrame.add"));
+		done.setText(Messages.getString("PointSettingsFrame.done"));
 	}
 
 	private void loadComponents(int start) {
@@ -121,13 +135,17 @@ public class PointSettingsFrame extends JFrame {
 		this.contentPanel.repaint();
 	}
 
-	class PointSettingsPanel extends JPanel {
+	class PointSettingsPanel extends JPanel implements ILocaleChangeListener {
 
 		private static final long serialVersionUID = -6900549933290746043L;
 
 		private PointSettingsFrame parent;
 		private int index;
 		public static final int TIMER_DELAY = 10;
+
+		// GUI elements:
+		private TitledBorder titledBorder;
+		private JButton button;
 
 		public PointSettingsPanel(ArrayList<Point> points, int index, PointSettingsFrame parent) {
 			this.parent = parent;
@@ -137,8 +155,9 @@ public class PointSettingsFrame extends JFrame {
 				this.setBackground(
 						coordSys.getLogic().unignoredPoints.contains(points.get(index)) ? this.getBackground()
 								: Color.RED);
-			this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.DARK_GRAY),
-					"Punkt #" + (index + 1)));
+			this.setBorder(
+					titledBorder = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.DARK_GRAY),
+							Messages.getString("PointSettingsPanel.point") + " #" + (index + 1)));
 			this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 			Point p = points.get(index);
 
@@ -146,7 +165,7 @@ public class PointSettingsFrame extends JFrame {
 			df.setRoundingMode(RoundingMode.HALF_UP);
 			JLabel label = new JLabel("( " + df.format(p.getX()) + " | " + df.format(p.getY()) + ")");
 			this.add(label);
-			JButton button = new JButton("delete");
+			button = new JButton(Messages.getString("PointSettingsPanel.delete"));
 			button.addActionListener(event -> {
 				points.remove(index);
 				button.setEnabled(false);
@@ -155,6 +174,7 @@ public class PointSettingsFrame extends JFrame {
 			});
 			this.add(button);
 			this.setVisible(true);
+			Messages.registerListener(this);
 		}
 
 		public void slideOut() {
@@ -170,5 +190,12 @@ public class PointSettingsFrame extends JFrame {
 			}).start();
 		}
 
+		@Override
+		public void onLocaleChange() {
+			titledBorder.setTitle(Messages.getString("PointSettingsPanel.point") + " #" + (index + 1));
+			button.setText(Messages.getString("PointSettingsPanel.delete"));
+		}
+
 	}
+
 }

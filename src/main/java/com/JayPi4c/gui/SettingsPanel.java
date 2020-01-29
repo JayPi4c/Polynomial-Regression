@@ -10,20 +10,29 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.border.TitledBorder;
 
 public class SettingsPanel extends JPanel implements ILocaleChangeListener {
 
 	private static final long serialVersionUID = -6865806340350516582L;
 	private JTextField input;
 	private JButton apply;
+	private JButton reset;
 
 	private ActionListener al;
 	private double current;
 
-	public SettingsPanel(String title, String toolTip, int min, int max, double current) {
-		this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.DARK_GRAY), title));
+	private String titleKey;
+	private String toolTipKey;
+	private TitledBorder titledBorder;
+
+	public SettingsPanel(String titleKey, String toolTipKey, int min, int max, double current) {
+		this.titleKey = titleKey;
+		this.toolTipKey = toolTipKey;
+		this.setBorder(titledBorder = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.DARK_GRAY),
+				Messages.getString(titleKey)));
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		this.setToolTipText(toolTip);
+		this.setToolTipText(Messages.getString(toolTipKey));
 		this.current = current;
 		// control the values in this panel:
 		JPanel inputPanel = new JPanel();
@@ -37,9 +46,9 @@ public class SettingsPanel extends JPanel implements ILocaleChangeListener {
 
 		JPanel controlPanel = new JPanel();
 		controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
-		apply = new JButton("SettingsPanel.apply");
+		apply = new JButton(Messages.getString("SettingsPanel.apply"));
 
-		JButton reset = new JButton(Messages.getString("SettingsPanel.reset"));
+		reset = new JButton(Messages.getString("SettingsPanel.reset"));
 		reset.addActionListener(event -> {
 			slider.setValue((min + max) / 2);
 			input.setText(slider.getValue() + "");
@@ -77,8 +86,10 @@ public class SettingsPanel extends JPanel implements ILocaleChangeListener {
 
 	@Override
 	public void onLocaleChange() {
-		// TODO Auto-generated method stub
-
+		titledBorder.setTitle(Messages.getString(titleKey));
+		setToolTipText(Messages.getString(toolTipKey));
+		apply.setText(Messages.getString("SettingsPanel.apply"));
+		reset.setText(Messages.getString("SettingsPanel.reset"));
 	}
 
 }

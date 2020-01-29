@@ -52,7 +52,7 @@ public class Frame extends JFrame implements ILocaleChangeListener {
 		settings = new JMenu(Messages.getString("Frame.settings"));
 		settings.setMnemonic(KeyEvent.VK_S);
 
-		autoAdjusting = new JCheckBoxMenuItem(Messages.getString("Frame.autoAdjusting"));
+		autoAdjusting = new JCheckBoxMenuItem(Messages.getString("Frame.autoAdjust"));
 		// anstelle von einer Ausgabe muss hier dann eine Funktion getriggert werden,
 		// die automatisch eine Auto-adjusting vornimmt.
 		autoAdjusting.addActionListener(event -> {
@@ -64,7 +64,7 @@ public class Frame extends JFrame implements ILocaleChangeListener {
 		});
 		autoAdjusting.setToolTipText(Messages.getString("Frame.adjustToolTip"));
 
-		ignoreOutliers = new JCheckBoxMenuItem("ignore outliers");
+		ignoreOutliers = new JCheckBoxMenuItem(Messages.getString("Frame.ignoreOutliers"));
 		ignoreOutliers.addActionListener(event -> {
 			coordSys.getLogic().ignoreOutliers = ignoreOutliers.isSelected();
 			if (coordSys.getLogic().points.size() > 0) {
@@ -73,15 +73,15 @@ public class Frame extends JFrame implements ILocaleChangeListener {
 				coordSys.repaint();
 			}
 		});
-		ignoreOutliers.setToolTipText("Yet to do");
+		ignoreOutliers.setToolTipText(Messages.getString("Frame.ignoreOutliers.toolTip"));
 
-		showHints = new JCheckBoxMenuItem("show Hints");
+		showHints = new JCheckBoxMenuItem(Messages.getString("Frame.showHints"));
 		showHints.setSelected(coordSys.drawHints);
 		showHints.addActionListener(event -> {
 			coordSys.drawHints = showHints.isSelected();
 			coordSys.repaint();
 		});
-		showHints.setToolTipText("show hints");
+		showHints.setToolTipText(Messages.getString("Frame.showHints.toolTip"));
 
 		window = new JMenuItem(Messages.getString("Frame.changeWindow"));
 		window.addActionListener(event -> SwingUtilities.invokeLater(new Runnable() {
@@ -110,7 +110,7 @@ public class Frame extends JFrame implements ILocaleChangeListener {
 			}
 		});
 
-		controlPoints = new JMenuItem("Control Points");
+		controlPoints = new JMenuItem(Messages.getString("Frame.controlPoints"));
 		controlPoints.addActionListener(event -> new PointSettingsFrame(coordSys));
 
 		settings.add(setValues);
@@ -126,12 +126,12 @@ public class Frame extends JFrame implements ILocaleChangeListener {
 		options = new JMenu(Messages.getString("Frame.options"));
 		options.setMnemonic(KeyEvent.VK_O);
 
-		language = new JMenu("Language");
+		language = new JMenu(Messages.getString("Frame.language"));
 		options.add(language);
 
-		english = new JMenuItem("English");
+		english = new JMenuItem(Messages.getString("Frame.english"));
 		english.addActionListener(event -> Messages.changeBundle("com.JayPi4c.messages_en"));
-		german = new JMenuItem("German");
+		german = new JMenuItem(Messages.getString("Frame.german"));
 		german.addActionListener(event -> Messages.changeBundle("com.JayPi4c.messages_de"));
 
 		language.add(english);
@@ -140,7 +140,7 @@ public class Frame extends JFrame implements ILocaleChangeListener {
 		// help:
 		help = new JMenu("Help");
 
-		credits = new JMenuItem("Credits");
+		credits = new JMenuItem(Messages.getString("Frame.credits"));
 		credits.addActionListener(event -> {
 			JEditorPane ep = new JEditorPane("text/html", "This program is inspired by:<br>"
 					+ "<a href=\"https://thecodingtrain.com/\">The coding train</a><br>"
@@ -163,7 +163,8 @@ public class Frame extends JFrame implements ILocaleChangeListener {
 			ep.setEditable(false);
 			ep.setBackground(coordSys.getBackground());
 
-			JOptionPane.showMessageDialog(null, ep, "Credits", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, ep, Messages.getString("Frame.credits"),
+					JOptionPane.INFORMATION_MESSAGE);
 		});
 
 		help.add(credits);
@@ -191,9 +192,12 @@ public class Frame extends JFrame implements ILocaleChangeListener {
 	public void onLocaleChange() {
 		setTitle(Messages.getString("Frame.title"));
 		settings.setText(Messages.getString("Frame.settings"));
-		autoAdjusting.setText(Messages.getString("Frame.autoAdjusting"));
+		autoAdjusting.setText(Messages.getString("Frame.autoAdjust"));
+		autoAdjusting.setToolTipText(Messages.getString("Frame.autoAdjust.toolTip"));
 		ignoreOutliers.setText(Messages.getString("Frame.ignoreOutliers"));
+		ignoreOutliers.setToolTipText(Messages.getString("Frame.ignoreOutliers.toolTip"));
 		showHints.setText(Messages.getString("Frame.showHints"));
+		showHints.setToolTipText(Messages.getString("Frame.showHints.toolTip"));
 		window.setText(Messages.getString("Frame.changeWindow"));
 		setValues.setText(Messages.getString("Frame.setValues"));
 		delPoints.setText(Messages.getString("Frame.delPoints"));
