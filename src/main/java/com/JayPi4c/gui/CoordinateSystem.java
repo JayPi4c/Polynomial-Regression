@@ -264,6 +264,7 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
+		// TODO: scroll in or out according to the scroll event
 	}
 
 	@Override
