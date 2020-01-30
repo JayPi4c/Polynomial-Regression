@@ -10,6 +10,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
@@ -23,6 +24,8 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 	private int r = 3;
 
 	private Logic logic;
+
+	private ArrayList<IAddingListener> addingListeners = new ArrayList<IAddingListener>();
 
 	public static final int WIDTH = 640;
 	public static final int HEIGHT = 480;
@@ -57,6 +60,14 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 
 	public Logic getLogic() {
 		return this.logic;
+	}
+
+	public void registerAddingListener(IAddingListener listener) {
+		addingListeners.add(listener);
+	}
+
+	public void removeAddingListener(IAddingListener listener) {
+		addingListeners.remove(listener);
 	}
 
 	@Override
@@ -240,6 +251,8 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 		Point p;
 		logic.points.add(p = getPoint(e.getX(), e.getY()));
 		logic.update();
+		for (IAddingListener listener : addingListeners)
+			listener.onPointAdded();
 		resizeWindow(p);
 		repaint();
 	}

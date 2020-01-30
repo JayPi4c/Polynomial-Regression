@@ -111,7 +111,10 @@ public class Frame extends JFrame implements ILocaleChangeListener {
 		});
 
 		controlPoints = new JMenuItem(Messages.getString("Frame.controlPoints"));
-		controlPoints.addActionListener(event -> new PointSettingsFrame(coordSys));
+		controlPoints.addActionListener(event -> {
+			if (!PointSettingsFrame.isLoaded)
+				new PointSettingsFrame(coordSys);
+		});
 
 		settings.add(setValues);
 		settings.add(controlPoints);
@@ -141,7 +144,9 @@ public class Frame extends JFrame implements ILocaleChangeListener {
 		help = new JMenu(Messages.getString("Frame.help"));
 
 		credits = new JMenuItem(Messages.getString("Frame.credits"));
-		credits.addActionListener(event -> {
+		credits.addActionListener(event ->
+
+		{
 			JEditorPane ep = new JEditorPane("text/html", "This program is inspired by:<br>"
 					+ "<a href=\"https://thecodingtrain.com/\">The coding train</a><br>"
 					+ "Please visit this website for the mathematics behind this program:<br>"

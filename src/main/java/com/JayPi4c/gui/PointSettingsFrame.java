@@ -24,9 +24,11 @@ import javax.swing.border.TitledBorder;
 
 import com.JayPi4c.logic.Point;
 
-public class PointSettingsFrame extends JFrame implements ILocaleChangeListener {
+public class PointSettingsFrame extends JFrame implements ILocaleChangeListener, IAddingListener {
 
 	private static final long serialVersionUID = -1864802896071899983L;
+
+	public static boolean isLoaded = false;
 
 	private CoordinateSystem coordSys;
 
@@ -43,6 +45,7 @@ public class PointSettingsFrame extends JFrame implements ILocaleChangeListener 
 
 	public PointSettingsFrame(CoordinateSystem sys) {
 		super(Messages.getString("PointSettingsFrame.title"));
+		isLoaded = true;
 		coordSys = sys;
 		scrollPane = new JScrollPane();
 		scrollPane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -97,6 +100,9 @@ public class PointSettingsFrame extends JFrame implements ILocaleChangeListener 
 		done = new JButton(Messages.getString("PointSettingsFrame.done"));
 		done.addActionListener(event -> {
 			setVisible(false);
+			Messages.removeListener(this);
+			coordSys.removeAddingListener(this);
+			isLoaded = false;
 			dispose();
 			if (coordSys.getLogic().points.size() > 0) {
 				coordSys.getLogic().update();
@@ -111,8 +117,16 @@ public class PointSettingsFrame extends JFrame implements ILocaleChangeListener 
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.setVisible(true);
+		coordSys.registerAddingListener(this);
 		Messages.registerListener(this);
 
+	}
+
+	@Override
+	public void onPointAdded() {
+		loadComponents(coordSys.getLogic().points.size() - 1);
+		this.contentPanel.revalidate();
+		this.contentPanel.repaint();
 	}
 
 	@Override
