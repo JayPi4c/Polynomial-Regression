@@ -88,6 +88,7 @@ public class SettingsPanel extends JPanel implements ILocaleChangeListener {
 	public void onLocaleChange() {
 		titledBorder.setTitle(Messages.getString(titleKey));
 		setToolTipText(Messages.getString(toolTipKey));
+		repaint();
 		apply.setText(Messages.getString("SettingsPanel.apply"));
 		reset.setText(Messages.getString("SettingsPanel.reset"));
 	}

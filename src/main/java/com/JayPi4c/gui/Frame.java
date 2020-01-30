@@ -62,7 +62,7 @@ public class Frame extends JFrame implements ILocaleChangeListener {
 				coordSys.repaint();
 			}
 		});
-		autoAdjusting.setToolTipText(Messages.getString("Frame.adjustToolTip"));
+		autoAdjusting.setToolTipText(Messages.getString("Frame.autoAdjust.toolTip"));
 
 		ignoreOutliers = new JCheckBoxMenuItem(Messages.getString("Frame.ignoreOutliers"));
 		ignoreOutliers.addActionListener(event -> {
@@ -138,7 +138,7 @@ public class Frame extends JFrame implements ILocaleChangeListener {
 		language.add(german);
 
 		// help:
-		help = new JMenu("Help");
+		help = new JMenu(Messages.getString("Frame.help"));
 
 		credits = new JMenuItem(Messages.getString("Frame.credits"));
 		credits.addActionListener(event -> {
