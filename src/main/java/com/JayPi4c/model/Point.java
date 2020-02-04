@@ -1,4 +1,4 @@
-package com.JayPi4c.logic;
+package com.JayPi4c.model;
 
 public class Point {
 
@@ -21,5 +21,4 @@ public class Point {
 	public double getY() {
 		return this.y;
 	}
-
 }

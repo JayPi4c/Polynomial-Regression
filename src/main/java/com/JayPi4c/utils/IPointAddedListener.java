@@ -1,5 +1,5 @@
-package com.JayPi4c.gui;
+package com.JayPi4c.utils;
 
-public interface IAddingListener {
-	public void onPointAdded();
+public interface IPointAddedListener {
+	void onPointAdded();
 }

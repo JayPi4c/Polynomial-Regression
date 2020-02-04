@@ -1,5 +1,5 @@
-package com.JayPi4c.gui;
+package com.JayPi4c.utils;
 
-public interface ILocaleChangeListener {
-	void onLocaleChange();
+public interface ILanguageChangeListener {
+	void onLanguageChanged();
 }

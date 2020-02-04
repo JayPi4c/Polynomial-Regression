@@ -1,78 +1,32 @@
-package com.JayPi4c.gui;
+package com.JayPi4c.controller;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import javax.swing.JPanel;
+import com.JayPi4c.model.IModel;
+import com.JayPi4c.model.Point;
+import com.JayPi4c.utils.IPointAddedListener;
+import com.JayPi4c.view.CoordinateSystemView;
 
-import com.JayPi4c.logic.Logic;
-import com.JayPi4c.logic.Point;
+public class CoordinateSystemController implements MouseListener {
+	CoordinateSystemView view;
 
-public class CoordinateSystem extends JPanel implements MouseListener, MouseWheelListener, MouseMotionListener {
+	private static final int R = 3;
+	IModel model;
 
-	private static final long serialVersionUID = 1000943736638858551L;
+	private static ArrayList<IPointAddedListener> pointAddedListeners = new ArrayList<IPointAddedListener>();
 
-	private int r = 3;
-
-	private Logic logic;
-
-	private ArrayList<IAddingListener> addingListeners = new ArrayList<IAddingListener>();
-
-	public static final int WIDTH = 640;
-	public static final int HEIGHT = 480;
-
-	// mit diesem Punkt wird festgestellt, in welchem Vektor sich das
-	// Koordinaten-System verschiebt
-	private Point startPos = null;
-
-	public boolean drawHints;
-	public double pos_x_axis, neg_x_axis, pos_y_axis, neg_y_axis;
-	public double x_steps, y_steps;
-
-	public CoordinateSystem() {
-		this(10, 10, 10, 10);
+	public CoordinateSystemController(IModel m, CoordinateSystemView v) {
+		model = m;
+		view = v;
 	}
 
-	public CoordinateSystem(double pos_x_axis, double neg_x_axis, double pos_y_axis, double neg_y_axis) {
-		this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-		this.pos_x_axis = pos_x_axis;
-		this.neg_x_axis = neg_x_axis;
-		this.pos_y_axis = pos_y_axis;
-		this.neg_y_axis = neg_y_axis;
-		this.x_steps = 1;
-		this.y_steps = 1;
-		this.drawHints = true;
-		this.logic = new Logic();
-		this.setFocusable(true);
-		this.addMouseListener(this);
-		this.addMouseWheelListener(this);
-		this.addMouseMotionListener(this);
-	}
-
-	public Logic getLogic() {
-		return this.logic;
-	}
-
-	public void registerAddingListener(IAddingListener listener) {
-		addingListeners.add(listener);
-	}
-
-	public void removeAddingListener(IAddingListener listener) {
-		addingListeners.remove(listener);
-	}
-
-	@Override
-	public void paint(Graphics g) {
-		int w = this.getWidth(), h = this.getHeight();
+	public BufferedImage getImage() {
+		int w = view.getWidth(), h = view.getHeight();
 		BufferedImage buffer = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2d = (Graphics2D) buffer.getGraphics();
 		g2d.setColor(new Color(51, 51, 51));
@@ -82,14 +36,14 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 		g2d.setColor(new Color(0, 0, 255));
 
 		// draw y-axis
-		double proportion = neg_x_axis / (pos_x_axis + neg_x_axis);
+		double proportion = model.getNeg_x_axis() / (model.getPos_x_axis() + model.getNeg_x_axis());
 		g2d.drawLine((int) (w * proportion), 0, (int) (w * proportion), h);
 
 		// draw x-axis
-		proportion = pos_y_axis / (pos_y_axis + neg_y_axis);
+		proportion = model.getPos_y_axis() / (model.getPos_y_axis() + model.getNeg_y_axis());
 		g2d.drawLine(0, (int) (h * proportion), w, (int) (h * proportion));
 
-		if (drawHints)
+		if (model.drawHints())
 			drawHints(g2d);
 
 		// draw the points:
@@ -99,42 +53,42 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 		drawFunction(g2d);
 
 		// draw the function as text
-		if (logic.polynomial != null) {
+		if (model.getPolynomial() != null) {
 			g2d.setColor(Color.WHITE);
-			g2d.drawString(logic.polynomial.getFormularFormatted(), 10, h - 10);
+			g2d.drawString(model.getPolynomial().getFormularFormatted(), 10, h - 10);
 		}
-		g.drawImage(buffer, 0, 0, null);
+		return buffer;
 	}
 
 	private void drawHints(Graphics2D g2d) {
-		int w = this.getWidth(), h = this.getHeight();
-		double originX = w * (neg_x_axis / (pos_x_axis + neg_x_axis));
-		double originY = h * (pos_y_axis / (pos_y_axis + neg_y_axis));
+		int w = view.getWidth(), h = view.getHeight();
+		double originX = w * (model.getNeg_x_axis() / (model.getPos_x_axis() + model.getNeg_x_axis()));
+		double originY = h * (model.getPos_y_axis() / (model.getPos_y_axis() + model.getNeg_y_axis()));
 		// x axis
-		double proportion = x_steps / (pos_x_axis + neg_x_axis);
+		double proportion = model.getXSteps() / (model.getPos_x_axis() + model.getNeg_x_axis());
 		double part = w * proportion;
 		// neg part of x axis
-		for (int i = 1; i <= (neg_x_axis / x_steps); i++) {
+		for (int i = 1; i <= (model.getNeg_x_axis() / model.getXSteps()); i++) {
 			double x = originX - i * part;
 			g2d.drawLine((int) x, (int) (originY - 3), (int) x, (int) (originY + 3));
 		}
 
 		// pos part of x axis
-		for (int i = 1; i <= (pos_x_axis / x_steps); i++) {
+		for (int i = 1; i <= (model.getPos_x_axis() / model.getXSteps()); i++) {
 			double x = originX + i * part;
 			g2d.drawLine((int) x, (int) (originY - 3), (int) x, (int) (originY + 3));
 		}
 		// y axis
-		proportion = y_steps / (pos_y_axis + neg_y_axis);
+		proportion = model.getYSteps() / (model.getPos_y_axis() + model.getNeg_y_axis());
 		part = h * proportion;
 		// neg part of y axis
-		for (int i = 1; i <= (neg_y_axis / y_steps); i++) {
+		for (int i = 1; i <= (model.getNeg_y_axis() / model.getYSteps()); i++) {
 			double y = originY + i * part;
 			g2d.drawLine((int) (originX - 3), (int) y, (int) (originX + 3), (int) y);
 		}
 
 		// pos part of y axis
-		for (int i = 1; i <= (pos_y_axis / y_steps); i++) {
+		for (int i = 1; i <= (model.getPos_y_axis() / model.getYSteps()); i++) {
 			double y = originY - i * part;
 
 			g2d.drawLine((int) (originX - 3), (int) y, (int) (originX + 3), (int) y);
@@ -143,20 +97,21 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 
 	private void drawPoints(Graphics2D g2d) {
 		g2d.setColor(new Color(200, 200, 200));
-		for (Point p : logic.points) {
+		for (Point p : model.getPoints()) {
 
 			Point convertedPoint = convertPoint(p);
-			g2d.fillOval((int) (convertedPoint.getX() - r), (int) (convertedPoint.getY() - r), r * 2, r * 2);
+			g2d.fillOval((int) (convertedPoint.getX() - R), (int) (convertedPoint.getY() - R), R * 2, R * 2);
 		}
 	}
 
 	private void drawFunction(Graphics2D g2d) {
-		if (logic.points.size() > logic.getDegree()) {
+		if (model.getPoints().size() > model.getDegree()) {
 			// draw the function:
 			g2d.setColor(new Color(0, 255, 0));
-			Point prev = convertPoint(new Point(-1 * neg_x_axis, logic.polynomial.getY(-1 * neg_x_axis)));
-			for (double i = -1 * neg_x_axis + 0.001; i < pos_x_axis; i += 0.001) {
-				Point p = new Point(i, logic.polynomial.getY(i));
+			Point prev = convertPoint(
+					new Point(-1 * model.getNeg_x_axis(), model.getPolynomial().getY(-1 * model.getNeg_x_axis())));
+			for (double i = -1 * model.getNeg_x_axis() + 0.001; i < model.getPos_x_axis(); i += 0.001) {
+				Point p = new Point(i, model.getPolynomial().getY(i));
 				Point convertedP = convertPoint(p);
 				g2d.drawLine((int) prev.getX(), (int) prev.getY(), (int) convertedP.getX(), (int) convertedP.getY());
 				prev = convertedP;
@@ -165,138 +120,85 @@ public class CoordinateSystem extends JPanel implements MouseListener, MouseWhee
 	}
 
 	private Point convertPoint(Point p) {
-		int w = this.getWidth(), h = this.getHeight();
-		double originX = w * (neg_x_axis / (pos_x_axis + neg_x_axis));
-		double originY = h * (pos_y_axis / (pos_y_axis + neg_y_axis));
+		int w = view.getWidth(), h = view.getHeight();
+		double originX = w * (model.getNeg_x_axis() / (model.getPos_x_axis() + model.getNeg_x_axis()));
+		double originY = h * (model.getPos_y_axis() / (model.getPos_y_axis() + model.getNeg_y_axis()));
 		double x = p.getX();
 		double x_out;
 		if (x < 0)
-			x_out = map(x, -1 * neg_x_axis, 0, 0, originX);
+			x_out = map(x, -1 * model.getNeg_x_axis(), 0, 0, originX);
 		else
-			x_out = map(x, 0, pos_x_axis, originX, w);
+			x_out = map(x, 0, model.getPos_x_axis(), originX, w);
 		double y_out;
 		double y = p.getY();
 		if (y < 0)
-			y_out = map(y, pos_y_axis, 0, 0, originY);
+			y_out = map(y, model.getPos_y_axis(), 0, 0, originY);
 		else
-			y_out = map(y, 0, -1 * neg_y_axis, originY, h);
+			y_out = map(y, 0, -1 * model.getNeg_y_axis(), originY, h);
 		return new Point(x_out, y_out);
 	}
 
 	private Point getPoint(double x, double y) {
-		int w = this.getWidth(), h = this.getHeight();
-		double originX = w * (neg_x_axis / (pos_x_axis + neg_x_axis));
-		double originY = h * (pos_y_axis / (pos_y_axis + neg_y_axis));
+		int w = view.getWidth(), h = view.getHeight();
+		double originX = w * (model.getNeg_x_axis() / (model.getPos_x_axis() + model.getNeg_x_axis()));
+		double originY = h * (model.getPos_y_axis() / (model.getPos_y_axis() + model.getNeg_y_axis()));
 
 		double x_out;
 		if (x < originX)
 
-			x_out = map(x, 0, originX, -1 * neg_x_axis, 0);
+			x_out = map(x, 0, originX, -1 * model.getNeg_x_axis(), 0);
 		else
-			x_out = map(x, originX, w, 0, pos_x_axis);
+			x_out = map(x, originX, w, 0, model.getPos_x_axis());
 		double y_out;
 		if (y < originY)
-			y_out = map(y, 0, originY, pos_y_axis, 0);
+			y_out = map(y, 0, originY, model.getPos_y_axis(), 0);
 		else
-			y_out = map(y, originY, h, 0, -1 * neg_y_axis);
+			y_out = map(y, originY, h, 0, -1 * model.getNeg_y_axis());
 
 		return new Point(x_out, y_out);
 	}
 
-	public void resizeWindow(Point p) {
-		if (p.getX() < -1 * neg_x_axis)
-			neg_x_axis = p.getX() + neg_x_axis * 0.01;
-		else if (p.getX() > pos_x_axis)
-			pos_x_axis = p.getX() + pos_x_axis * 0.01;
-		if (p.getY() < -1 * neg_y_axis)
-			neg_y_axis = p.getY() + neg_y_axis * 0.01;
-		else if (p.getY() > pos_y_axis)
-			pos_y_axis = p.getY() + pos_y_axis * 0.01;
-
-	}
-
-	private void moveSystem(double xOffset, double yOffset) {
-		neg_x_axis -= xOffset;
-		pos_x_axis += xOffset;
-		neg_y_axis -= yOffset;
-		pos_y_axis += yOffset;
-	}
-
-	// TODO: mousePressed started -> mouseDragged update -> mouseReleased nutzen, um
-	// CoordSys zu verschieben
-	@Override
-	public void mouseReleased(MouseEvent e) {
-
-		if (startPos != null) {
-			Point endPos = getPoint(e.getX(), e.getY());
-			double xOff = startPos.getX() - endPos.getX();
-			double yOff = startPos.getY() - endPos.getY();
-			startPos = null;
-			moveSystem(xOff, yOff);
-			repaint();
-		}
-
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-	}
-
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		Point p;
-		logic.points.add(p = getPoint(e.getX(), e.getY()));
-		logic.update();
-		for (IAddingListener listener : addingListeners)
+		// Point p;
+		// model.addPoint(p = getPoint(e.getX(), e.getY()));
+
+		model.addPoint(getPoint(e.getX(), e.getY()));
+		model.update();
+		view.repaint();
+
+		for (IPointAddedListener listener : pointAddedListeners)
 			listener.onPointAdded();
-		resizeWindow(p);
-		repaint();
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		startPos = getPoint(e.getX(), e.getY());
-	}
-
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		// TODO: scroll in or out according to the scroll event
-	}
-
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		// Mit dieser Funktion stimmt irgendetwas noch nicht so ganz. ist dieser Teil im
-		// Programm implementiert, das verschieben goes crazy
-		/*
-		 * if (startPos != null) { Point endPos = getPoint(e.getX(), e.getY()); double
-		 * xOff = startPos.getX() - endPos.getX(); double yOff = startPos.getY() -
-		 * endPos.getY(); startPos = endPos; moveSystem(xOff, yOff); repaint();
-		 * 
-		 * }
-		 */
 
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent e) {
+	public void mouseReleased(MouseEvent e) {
 	}
 
-	/**
-	 * copied from Processing.org
-	 * 
-	 * @param value
-	 * @param istart
-	 * @param istop
-	 * @param ostart
-	 * @param ostop
-	 * @return
-	 */
+	@Override
+	public void mouseEntered(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+
+	}
+
+	public static void registerPointAddedListener(IPointAddedListener listener) {
+		pointAddedListeners.add(listener);
+	}
+
+	public static void removePointAddedListener(IPointAddedListener listener) {
+		pointAddedListeners.remove(listener);
+	}
+
 	private static final double map(double value, double istart, double istop, double ostart, double ostop) {
 		return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 	}
-
 }

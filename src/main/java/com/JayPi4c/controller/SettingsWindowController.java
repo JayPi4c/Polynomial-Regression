@@ -1,102 +1,118 @@
-package com.JayPi4c.gui;
+package com.JayPi4c.controller;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.WindowConstants;
+import javax.swing.JOptionPane;
 
-public class WindowSettingsFrame extends JFrame implements ILocaleChangeListener {
+import com.JayPi4c.model.IModel;
+import com.JayPi4c.utils.Messages;
+import com.JayPi4c.view.MainView;
+import com.JayPi4c.view.SettingsView;
+import com.JayPi4c.view.SettingsWindowElementView;
+import com.JayPi4c.view.SettingsWindowView;
 
-	private static final long serialVersionUID = -5987437176470122610L;
+public class SettingsWindowController {
+	IModel model;
+	SettingsWindowView view;
 
-	CoordinateSystem coordSys;
+	SettingsWindowElementView swevPosX;
+	SettingsWindowElementView swevPosY;
+	SettingsWindowElementView swevNegX;
+	SettingsWindowElementView swevNegY;
+	SettingsWindowElementView swevSpacerX;
+	SettingsWindowElementView swevSpacerY;
 
-	private SettingsPanel neg_x_axisPanel;
-	private SettingsPanel pos_x_axisPanel;
-	private SettingsPanel neg_y_axisPanel;
-	private SettingsPanel pos_y_axisPanel;
-	private SettingsPanel xHintSpacerPanel;
-	private SettingsPanel yHintSpacerPanel;
+	public SettingsWindowController(IModel model, SettingsView settingsView, MainView mainView) {
+		this.model = model;
 
-	private JButton apply;
-	private JButton done;
+		view = new SettingsWindowView();
+		loadComponents();
+		settingsView.setContentViewPort(view);
+		view.addShowHintsCheckBox(model.drawHints());
+		view.addApplyButton(new ActionListener() {
 
-	public WindowSettingsFrame(CoordinateSystem sys) {
-		super(Messages.getString("WindowSettingsFrame.title"));
-		coordSys = sys;
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					model.setPos_x_axis(swevPosX.getInput());
+				} catch (NumberFormatException exc) {
+					showErrorDialog(Messages.getString("Settings.window.posX.errorMsg"), view, swevPosX);
+				}
+				try {
+					model.setPos_y_axis(swevPosY.getInput());
+				} catch (NumberFormatException exc) {
+					showErrorDialog(Messages.getString("Settings.window.posY.errorMsg"), view, swevPosY);
+				}
+				try {
+					model.setNeg_x_axis(swevNegX.getInput());
+				} catch (NumberFormatException exc) {
+					showErrorDialog(Messages.getString("Settings.window.negX.errorMsg"), view, swevNegX);
+				}
+				try {
+					model.setNeg_y_axis(swevNegY.getInput());
+				} catch (NumberFormatException exc) {
+					showErrorDialog(Messages.getString("Settings.window.negY.errorMsg"), view, swevNegY);
+				}
+				try {
+					model.setXSteps(swevSpacerX.getInput());
+				} catch (NumberFormatException exc) {
+					showErrorDialog(Messages.getString("Settings.window.spacerX.errorMsg"), view, swevSpacerX);
+				}
+				try {
+					model.setYSteps(swevSpacerY.getInput());
+				} catch (NumberFormatException exc) {
+					showErrorDialog(Messages.getString("Settings.window.spacerY.errorMsg"), view, swevSpacerY);
+				}
+				model.setDrawHints(view.getShowHintsCheckBox().isSelected());
 
-		neg_x_axisPanel = new SettingsPanel("WindowSettingsFrame.negXAxis", "WindowSettingsFrame.negXAxis.toolTip",
-				-100, 0, coordSys.neg_x_axis);
-		neg_x_axisPanel.addListener(event -> coordSys.neg_x_axis = Math.abs(neg_x_axisPanel.getValue()));
-		pos_x_axisPanel = new SettingsPanel("WindowSettingsFrame.posXAxis", "WindowSettingsFrame.posXAxis.toolTip", 0,
-				100, coordSys.pos_x_axis);
-		pos_x_axisPanel.addListener(event -> coordSys.pos_x_axis = pos_x_axisPanel.getValue());
-		neg_y_axisPanel = new SettingsPanel("WindowSettingsFrame.negYAxis", "WindowSettingsFrame.negYAxis.toolTip",
-				-100, 0, coordSys.neg_y_axis);
-		neg_y_axisPanel.addListener(event -> coordSys.neg_y_axis = Math.abs(neg_y_axisPanel.getValue()));
-		pos_y_axisPanel = new SettingsPanel("WindowSettingsFrame.posYAxis", "WindowSettingsFrame.posYAxis.toolTip", 0,
-				100, coordSys.pos_y_axis);
-		pos_y_axisPanel.addListener(event -> coordSys.pos_y_axis = pos_y_axisPanel.getValue());
-		xHintSpacerPanel = new SettingsPanel("WindowSettingsFrame.xHintSpacer",
-				"WindowSettingsFrame.xHintSpacer.toolTip", 0, 50, coordSys.x_steps);
-		xHintSpacerPanel.addListener(event -> coordSys.x_steps = xHintSpacerPanel.getValue());
-		yHintSpacerPanel = new SettingsPanel("WindowSettingsFrame.yHintSpacer",
-				"WindowSettingsFrame.yHintSpacer.toolTip", 0, 50, coordSys.y_steps);
-		yHintSpacerPanel.addListener(event -> coordSys.y_steps = yHintSpacerPanel.getValue());
+				model.update();
 
-		JPanel contentPanel = new JPanel();
-		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-
-		contentPanel.add(neg_x_axisPanel);
-		contentPanel.add(pos_x_axisPanel);
-		contentPanel.add(neg_y_axisPanel);
-		contentPanel.add(pos_y_axisPanel);
-		contentPanel.add(xHintSpacerPanel);
-		contentPanel.add(yHintSpacerPanel);
-
-		this.setLayout(new BorderLayout());
-		this.add(contentPanel, BorderLayout.CENTER);
-		JPanel controlPanel = new JPanel();
-		controlPanel.setLayout(new FlowLayout());
-		apply = new JButton(Messages.getString("WindowSettingsFrame.applyAll"));
-		apply.addActionListener(event -> {
-			for (Component c : contentPanel.getComponents()) {
-				SettingsPanel sp = (SettingsPanel) (c);
-				sp.apply();
+				mainView.getCoordinateSystemView().repaint();
 			}
-
 		});
-		controlPanel.add(apply);
-		done = new JButton(Messages.getString("WindowSettingsFrame.done"));
-		done.addActionListener(event -> {
-			setVisible(false);
-			dispose();
-			Messages.removeListener(WindowSettingsFrame.this);
-			if (coordSys.getLogic().points.size() > 0)
-				coordSys.getLogic().update();
-			coordSys.repaint();
-		});
-		controlPanel.add(done);
-		this.add(controlPanel, BorderLayout.SOUTH);
-		this.setResizable(false);
-
-		this.setLocationRelativeTo(null);
-		this.setVisible(true);
-		Messages.registerListener(this);
-
-		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		this.pack();
 	}
 
-	@Override
-	public void onLocaleChange() {
-		setTitle(Messages.getString("WindowSettingsFrame.title"));
-		done.setText(Messages.getString("WindowSettingsFrame.done"));
-		apply.setText(Messages.getString("WindowSettingsFrame.apply"));
+	private void showErrorDialog(String msg, Component parent, SettingsWindowElementView element) {
+		JOptionPane.showMessageDialog(parent, msg);
+		element.setInput(element.getResetValue());
 	}
+
+	private void addController(SettingsWindowElementView elt) {
+		elt.setResetController(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				elt.setInput(elt.getResetValue());
+			}
+		});
+	}
+
+	private void loadComponents() {
+		swevPosX = new SettingsWindowElementView(Messages.getString("Settings.window.posX"), model.getPos_x_axis());
+		addController(swevPosX);
+		view.add(swevPosX);
+
+		swevNegX = new SettingsWindowElementView(Messages.getString("Settings.window.negX"), model.getNeg_x_axis());
+		addController(swevNegX);
+		view.add(swevNegX);
+
+		swevPosY = new SettingsWindowElementView(Messages.getString("Settings.window.posY"), model.getPos_y_axis());
+		addController(swevPosY);
+		view.add(swevPosY);
+
+		swevNegY = new SettingsWindowElementView(Messages.getString("Settings.window.negY"), model.getNeg_y_axis());
+		addController(swevNegY);
+		view.add(swevNegY);
+
+		swevSpacerX = new SettingsWindowElementView(Messages.getString("Settings.window.spacerX"), model.getXSteps());
+		addController(swevSpacerX);
+		view.add(swevSpacerX);
+
+		swevSpacerY = new SettingsWindowElementView(Messages.getString("Settings.window.spacerY"), model.getYSteps());
+		addController(swevSpacerY);
+		view.add(swevSpacerY);
+	}
+
 }

@@ -12,50 +12,43 @@ import javax.swing.border.TitledBorder;
 
 import com.JayPi4c.utils.Messages;
 
-public class SettingsRegressionElementView<T extends Number> extends JPanel {
+public class SettingsWindowElementView extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
 	private TitledBorder titledBorder;
 	private JButton reset;
 	private JTextField inputField;
-	private T initialValue;
+	private double initialValue;
 
-	private Class<T> type;
-
-	public SettingsRegressionElementView(String title, T initialValue, Class<T> type) {
-		this.type = type;
-		this.initialValue = initialValue;
+	public SettingsWindowElementView(String title, double initVal) {
+		initialValue = initVal;
 		setBorder(titledBorder = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.DARK_GRAY),
 				title));
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		inputField = new JTextField(initialValue.toString());
+		inputField = new JTextField(initVal + "");
 		add(inputField);
-		add(reset = new JButton(Messages.getString("Settings.regression.reset")));
-	}
-
-	// Ist das zulässig? Darf eine View Generics haben?
-	public T getInput() throws NumberFormatException {
-		if (type == Double.class)
-			return type.cast(Double.parseDouble(inputField.getText()));
-		return type.cast(Integer.parseInt(inputField.getText()));
-
-	}
-
-	public void setInput(T d) {
-		inputField.setText(d.toString());
-	}
-
-	public T getResetValue() {
-		return initialValue;
-	}
-
-	public TitledBorder getTitledBorder() {
-		return titledBorder;
+		add(reset = new JButton(Messages.getString("Settings.window.reset")));
 	}
 
 	public JButton getResetButton() {
 		return reset;
+	}
+
+	public double getInput() throws NumberFormatException {
+		return Double.parseDouble(inputField.getText());
+	}
+
+	public void setInput(double d) {
+		inputField.setText(d + "");
+	}
+
+	public double getResetValue() {
+		return initialValue;
+	}
+
+	public TitledBorder getTitledBorer() {
+		return titledBorder;
 	}
 
 	public void setResetController(ActionListener controller) {
