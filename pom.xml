@@ -5,18 +5,25 @@
 	<groupId>com.JayPi4c</groupId>
 	<artifactId>Polynomial-Regression</artifactId>
 	<version>1.0.0</version>
-	
-	
+
+
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
-			<groupId>com.JayPi4c</groupId>
+			<groupId>com.github.JayPi4c</groupId>
 			<artifactId>Matrix</artifactId>
-			<version>1.0.0</version>
+			<version>8c7d45a8ea</version>
 		</dependency>
 		<dependency>
-			<groupId>com.JayPi4c</groupId>
+			<groupId>com.github.jaypi4c</groupId>
 			<artifactId>Polynomial</artifactId>
-			<version>v1.0.0</version>
+			<version>1426e4426e</version>
 		</dependency>
 	</dependencies>
 
