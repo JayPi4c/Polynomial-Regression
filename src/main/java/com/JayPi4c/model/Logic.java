@@ -1,4 +1,4 @@
-package com.JayPi4c.logic;
+package com.JayPi4c.model;
 
 import java.util.ArrayList;
 
@@ -8,20 +8,30 @@ import com.JayPi4c.Vector;
 
 public class Logic {
 
-	public ArrayList<Point> points;
-	public ArrayList<Point> unignoredPoints;
-	public Polynomial polynomial;
-	public int degree = 0;
-	public int maxDegree = 8;
-	public double threshold = 0.3;
-	public int iterations = 50;
-	public boolean autoAdjusting = false;
-	public boolean ignoreOutliers = false;
-	public int ignoreCount = 1;
+	private static Logic instance = null;
 
-	public Logic() {
+	private ArrayList<Point> points;
+
+	private Polynomial polynomial = null;
+	private int degree = 0;
+	private int iterations = 50;
+	private int maxDegree = 8;
+	private double threshold = 0.3;
+	private boolean autoAdjusting = true;
+	private boolean ignoreOutliers = false;
+	private int ignoreCount = 1;
+
+	private ArrayList<Point> unignoredPoints = new ArrayList<Point>();
+
+	private Logic() {
 		points = new ArrayList<Point>();
-		unignoredPoints = new ArrayList<Point>();
+
+	}
+
+	public static Logic getInstance() {
+		if (instance == null)
+			instance = new Logic();
+		return instance;
 	}
 
 	public Polynomial calculateCoefficients(ArrayList<Point> ps) {
@@ -76,21 +86,15 @@ public class Logic {
 	private double getDistance(Point p, Polynomial poly) {
 		double a = p.getX();
 		double b = p.getY();
-		double coeffs1[] = { a * a, -2 * a, 1, b * b };
-		int degrees1[] = { 0, 1, 2, 0 };
-		// a²-2ax+x²+b²-2bf(x)+(f(x))²
-		Polynomial p1 = new Polynomial(coeffs1, degrees1);
-		Polynomial copy = poly.copy();
-		copy.mult((-2 * b));
-		p1.add(copy);
-		copy = poly.copy();
-		copy.mult(copy);
-		p1.add(copy);
-		p1.combine();
-		p1.reorder();
-		p1.fill();
-		double root1 = p1.getRoot(a, iterations);
-		double dist1 = Math.sqrt((a - root1) * (a - root1) + (b - poly.getY(root1)) * (b - poly.getY(root1)));
+		/*
+		 * double coeffs1[] = { a * a, -2 * a, 1, b * b }; int degrees1[] = { 0, 1, 2, 0
+		 * }; // a²-2ax+x²+b²-2bf(x)+(f(x))² Polynomial p1 = new Polynomial(coeffs1,
+		 * degrees1); Polynomial copy = poly.copy(); copy.mult((-2 * b)); p1.add(copy);
+		 * copy = poly.copy(); copy.mult(copy); p1.add(copy); p1.combine();
+		 * p1.reorder(); p1.fill(); double root1 = p1.getRoot(a, iterations); double
+		 * dist1 = Math.sqrt((a - root1) * (a - root1) + (b - poly.getY(root1)) * (b -
+		 * poly.getY(root1)));
+		 */
 
 		// -a+x-bf'(x)+f(x)*f'(x)
 		double coeffs2[] = { -a, 1 };
@@ -99,14 +103,13 @@ public class Logic {
 		Polynomial derivative = poly.getDerivation();
 		derivative.mult(-b);
 		p2.add(derivative);
-		copy = poly.copy();
+		Polynomial copy = poly.copy();
 		copy.mult(poly.getDerivation());
 		p2.add(copy);
 		double root2 = p2.getRoot(a, iterations);
 
 		double dist2 = Math.sqrt((a - root2) * (a - root2) + (b - poly.getY(root2)) * (b - poly.getY(root2)));
-
-		return Math.min(dist1, dist2);
+		return dist2;
 	}
 
 	/**
@@ -163,6 +166,10 @@ public class Logic {
 	}
 
 	public void update() {
+		if (points.size() == 0) {
+			polynomial = null;
+			return;
+		}
 		if (autoAdjusting && ignoreOutliers && points.size() > ignoreCount)
 			polynomial = calculateAdjustedCoefficientsIgnoreOutliers();
 		else if (autoAdjusting) {
@@ -180,18 +187,86 @@ public class Logic {
 
 	}
 
-	// ------------------HELPER-----------------
+	// -------------------- HELPER --------------------//
+
+	public ArrayList<Point> getPoints() {
+		return points;
+	}
+
+	public void setPoints(ArrayList<Point> pts) {
+		points = pts;
+	}
 
 	public void addPoint(Point p) {
 		points.add(p);
+	}
+
+	public void removePoint(Point p) {
+		points.remove(p);
+	}
+
+	public void setPolynomial(Polynomial p) {
+		polynomial = p;
+	}
+
+	public Polynomial getPolynomial() {
+		return polynomial;
 	}
 
 	public int getDegree() {
 		return degree;
 	}
 
-	public void setDegree(int d) {
-		degree = Math.min(maxDegree, d);
+	public void setDegree(int deg) {
+		degree = deg;
+	}
+
+	public int getMaxDegree() {
+		return maxDegree;
+	}
+
+	public void setMaxDegree(int deg) {
+		maxDegree = deg;
+	}
+
+	public int getIterations() {
+		return iterations;
+	}
+
+	public void setIterations(int iter) {
+		iterations = iter;
+	}
+
+	public double getThreshold() {
+		return threshold;
+	}
+
+	public void setThreshold(double thresh) {
+		threshold = thresh;
+	}
+
+	public int getIgnoreCount() {
+		return ignoreCount;
+	}
+
+	public void setIgnoreCount(int count) {
+		ignoreCount = count;
+	}
+
+	public void setAutoAdjusting(boolean flag) {
+		autoAdjusting = flag;
+	}
+
+	public boolean getAutoAdjusting() {
+		return autoAdjusting;
+	}
+
+	public void setIgnoreOutliers(boolean flag) {
+		ignoreOutliers = flag;
+	}
+
+	public boolean getIgnoreOutliers() {
+		return ignoreOutliers;
 	}
 
 }

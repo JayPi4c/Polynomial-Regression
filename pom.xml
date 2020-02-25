@@ -1,37 +1,59 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.JayPi4c</groupId>
-  <artifactId>Polynomial-Regression</artifactId>
-  <version>v1.0.0</version>
-  <repositories>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.JayPi4c</groupId>
+	<artifactId>Polynomial-Regression</artifactId>
+	<version>1.0.0</version>
+
+
+	<repositories>
 		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
 		</repository>
-  </repositories>
-  <dependencies>
- 		<dependency>
-	    	<groupId>com.github.JayPi4c</groupId>
-	    	<artifactId>Matrix</artifactId>
-	    	<version>v1.0.0</version>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.JayPi4c</groupId>
+			<artifactId>Matrix</artifactId>
+			<version>8c7d45a8ea</version>
 		</dependency>
 		<dependency>
-	    	<groupId>com.github.JayPi4c</groupId>
-	    	<artifactId>Polynomial</artifactId>
-	    	<version>v1.0.0</version>
+			<groupId>com.github.jaypi4c</groupId>
+			<artifactId>Polynomial</artifactId>
+			<version>1426e4426e</version>
 		</dependency>
-  </dependencies>
-  <build>
-    <sourceDirectory>src</sourceDirectory>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+	</dependencies>
+
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.2</version>
+				<configuration> <!-- Compile java 8 compatible bytecode -->
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>com.JayPi4c.Main</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
