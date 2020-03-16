@@ -88,6 +88,7 @@ public class MainController implements ILanguageChangeListener {
 		mainView.getSettingsButton().setText(Messages.getString("Main.settings"));
 		mainView.getOptionsButton().setText(Messages.getString("Main.options"));
 		mainView.getPointsButton().setText(Messages.getString("Main.points"));
+		mainView.getHelpButton().setText(Messages.getString("Main.help"));
 		mainView.setTitle(Messages.getString("Main.title"));
 	}
 
