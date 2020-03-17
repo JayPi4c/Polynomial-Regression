@@ -1,12 +1,12 @@
 package com.JayPi4c.view;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -32,13 +32,16 @@ public class PointsListElementView extends JPanel {
 
 		setBorder(tiltedBorder = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.DARK_GRAY),
 				Messages.getString("Points.list.title") + (titleNumber = (" #" + (index + 1)))));
-		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		// setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		setLayout(new BorderLayout());
 		DecimalFormat df = new DecimalFormat("#.####");
 		df.setRoundingMode(RoundingMode.HALF_UP);
 		JLabel label = new JLabel("( " + df.format(x) + " | " + df.format(y) + " )");
-		add(label);
+		label.setHorizontalAlignment(JLabel.CENTER);
+		label.setVerticalAlignment(JLabel.CENTER);
+		add(label, BorderLayout.CENTER);
 		delete = new JButton(Messages.getString("Points.list.delete"));
-		add(delete);
+		add(delete, BorderLayout.EAST);
 		setVisible(true);
 	}
 

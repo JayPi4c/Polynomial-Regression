@@ -158,17 +158,21 @@ public class CoordinateSystemController implements MouseListener {
 		return new Point(x_out, y_out);
 	}
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		// Point p;
-		// model.addPoint(p = getPoint(e.getX(), e.getY()));
-
-		model.addPoint(getPoint(e.getX(), e.getY()));
+	public void addPoints(Point... points) {
+		for (Point p : points)
+			model.addPoint(p);
 		model.update();
 		view.repaint();
 
 		for (IPointAddedListener listener : pointAddedListeners)
 			listener.onPointAdded();
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// Point p;
+		// model.addPoint(p = getPoint(e.getX(), e.getY()));
+		addPoints(getPoint(e.getX(), e.getY()));
 	}
 
 	@Override

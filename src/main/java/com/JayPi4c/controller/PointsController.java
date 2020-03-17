@@ -87,6 +87,15 @@ public class PointsController implements ILanguageChangeListener {
 			}
 		});
 
+		view.setImportPointsController(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				removeListeners();
+				currentContentController = new PointsImportController(model, view, mainView);
+			}
+		});
+
 		view.setListPointsController(new ActionListener() {
 
 			@Override
