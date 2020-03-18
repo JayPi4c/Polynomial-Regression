@@ -1,9 +1,16 @@
 package com.JayPi4c.controller;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.JayPi4c.model.IModel;
+import com.JayPi4c.model.Point;
 import com.JayPi4c.utils.ILanguageChangeListener;
 import com.JayPi4c.utils.Messages;
 import com.JayPi4c.view.MainView;
@@ -45,7 +52,31 @@ public class PointsImportController implements ILanguageChangeListener {
 		});
 
 		view.addImportButtonListener(e -> {
-			System.out.println("Import Event occured!");
+			if (path.equals("")) {
+				JOptionPane.showMessageDialog(view, Messages.getString("Points.import.error"));
+				return;
+			}
+			try {
+				BufferedReader br = Files.newBufferedReader(Paths.get(path));
+				String line = null;
+				// skip the header line
+				// if(header)
+				br.readLine();
+				while ((line = br.readLine()) != null) {
+					String[] parts = line.split(",");
+					double x = Double.parseDouble(parts[0]);
+					double y = Double.parseDouble(parts[1]);
+					model.addPoint(new Point(x, y));
+				}
+				model.update();
+				mainView.getCoordinateSystemView().repaint();
+
+			} catch (IOException exception) {
+				exception.printStackTrace();
+			} catch (NumberFormatException nfe) {
+				System.out.println("could not format");
+			}
+
 		});
 	}
 
