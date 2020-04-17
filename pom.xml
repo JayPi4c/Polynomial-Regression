@@ -6,13 +6,9 @@
 	<artifactId>Polynomial-Regression</artifactId>
 	<version>1.0.0</version>
 
- <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
-        <junit.jupiter.version>5.6.2</junit.jupiter.version>
-        <junit.platform.version>1.6.2</junit.platform.version>
-    </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
 	<repositories>
 		<repository>
@@ -33,17 +29,11 @@
 			<version>1426e4426e</version>
 		</dependency>
 		<dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-runner</artifactId>
-            <version>${junit.platform.version}</version>
-            <scope>test</scope>
-        </dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.4.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 
@@ -59,6 +49,10 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			<plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+            </plugin>
 
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
