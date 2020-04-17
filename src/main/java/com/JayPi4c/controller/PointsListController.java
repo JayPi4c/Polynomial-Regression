@@ -35,7 +35,6 @@ public class PointsListController implements ILanguageChangeListener, IPointAdde
 
 		Messages.registerListener(this);
 		CoordinateSystemController.registerPointAddedListener(this);
-
 	}
 
 	private void addListeners() {
@@ -75,7 +74,6 @@ public class PointsListController implements ILanguageChangeListener, IPointAdde
 
 		view.revalidate();
 		view.repaint();
-
 	}
 
 	private void loadComponents(int start) {

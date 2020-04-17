@@ -107,6 +107,17 @@ public class PointsImportView extends JPanel {
 		importPanel.add(importButton);
 		add(settingsPanel, BorderLayout.NORTH);
 		add(importPanel, BorderLayout.SOUTH);
+
+	}
+
+	public String getDelimiter() {
+		if (comma.isSelected())
+			return ",";
+		if (tab.isSelected())
+			return "\t";
+		if (custom.isSelected())
+			return customDelimiter.getText();
+		return ",";
 	}
 
 	public void addPathChooseListener(ActionListener al) {
@@ -118,6 +129,7 @@ public class PointsImportView extends JPanel {
 	}
 
 	public void setPath(String path) {
+		System.out.println("current width: " + this.getWidth());
 		pathLabel.setText(path);
 	}
 

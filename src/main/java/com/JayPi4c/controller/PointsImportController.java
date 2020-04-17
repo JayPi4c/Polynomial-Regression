@@ -24,7 +24,9 @@ public class PointsImportController implements ILanguageChangeListener {
 	PointsImportView view;
 	IModel model;
 
-	String path = "";
+	final String INITIAL_PATH = "";
+
+	String path = INITIAL_PATH;
 
 	public PointsImportController(IModel model, PointsView view, MainView mainView) {
 		this.model = model;
@@ -52,29 +54,32 @@ public class PointsImportController implements ILanguageChangeListener {
 		});
 
 		view.addImportButtonListener(e -> {
-			if (path.equals("")) {
+			if (path.equals(INITIAL_PATH)) {
 				JOptionPane.showMessageDialog(view, Messages.getString("Points.import.error"));
 				return;
 			}
 			try {
 				BufferedReader br = Files.newBufferedReader(Paths.get(path));
-				String line = null;
+				String delimiter = view.getDelimiter();
 				// skip the header line
 				// if(header)
 				br.readLine();
+				String line = null;
 				while ((line = br.readLine()) != null) {
-					String[] parts = line.split(",");
+					String[] parts = line.split(delimiter);
 					double x = Double.parseDouble(parts[0]);
 					double y = Double.parseDouble(parts[1]);
 					model.addPoint(new Point(x, y));
 				}
 				model.update();
 				mainView.getCoordinateSystemView().repaint();
+				JOptionPane.showMessageDialog(view, "Points have been imported");
 
 			} catch (IOException exception) {
-				exception.printStackTrace();
+				JOptionPane.showMessageDialog(view, "Could not open file");
 			} catch (NumberFormatException nfe) {
-				System.out.println("could not format");
+				JOptionPane.showMessageDialog(view,
+						"Could not load files content; Maybe a wrong delimiter was selected");
 			}
 
 		});
