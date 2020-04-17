@@ -83,7 +83,7 @@ public class Logic {
 		return (sum / ps.size());
 	}
 
-	private double getDistance(Point p, Polynomial poly) {
+	protected double getDistance(Point p, Polynomial poly) {
 		double a = p.getX();
 		double b = p.getY();
 		/*
@@ -117,20 +117,20 @@ public class Logic {
 	 * Punkte, die den Polynom verfälschen nicht ignoriert. Dies kann den Polynom
 	 * deutlich verfälschen.
 	 */
-	private Polynomial calculateAdjustedCoefficients() {
+	protected Polynomial calculateAdjustedCoefficients() {
 		Polynomial poly = null;
 		for (int i = 0; i <= Math.min(maxDegree, points.size() - 1); i++) {
 			degree = i;
 			poly = calculateCoefficients(points);
 			double dist = getAverageDistance(points, poly);
-			if (dist < threshold)
+			if (dist <= threshold)
 				break;
 		}
 		return poly;
 	}
 
 	@SuppressWarnings("unchecked")
-	private Polynomial calculateCoefficientsIgnoreOutliers() {
+	protected Polynomial calculateCoefficientsIgnoreOutliers() {
 		Polynomial poly;
 		ArrayList<Point> current = (ArrayList<Point>) points.clone();
 		int record_index = 0;
@@ -153,7 +153,7 @@ public class Logic {
 		return calculateCoefficients(current);
 	}
 
-	private Polynomial calculateAdjustedCoefficientsIgnoreOutliers() {
+	protected Polynomial calculateAdjustedCoefficientsIgnoreOutliers() {
 		Polynomial poly = null;
 		for (int i = 0; i <= Math.min(maxDegree, points.size() - 1); i++) {
 			degree = i;
